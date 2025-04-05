@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Poppins } from "next/font/google"
 import './globals.css'
-
+import Provider from '@/providers/Provider';
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -98,7 +98,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        {children}
+        <Provider attribute="class" enableSystem storageKey='arms-theme'>
+          {children}
+        </Provider>
       </body>
     </html>
   )
