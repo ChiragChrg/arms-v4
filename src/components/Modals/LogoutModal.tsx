@@ -2,31 +2,29 @@
 import Modal from './Modal'
 import { signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-import useModalStore from '@/store/useModalStore'
-import useUserStore from '@/store/useUserStore'
-import useSidebarStore from '@/store/useSidebarStore'
-import useLoaderStore from '@/store/useLoaderStore'
 import { Button } from '@/components/ui/button'
 import { LogOutIcon, X } from 'lucide-react'
+import { loaderActions } from '@/store/loaderSlice/loaderSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { modalActions, sidebarActions, userActions } from '@/store'
+import { SEL_showModal } from '@/store'
 
 const LogoutModal = () => {
-    const { isOpen, onClose } = useModalStore()
-    const { deleteUser } = useUserStore()
-    const { setShowSidebar } = useSidebarStore()
-    const { setShowLoader } = useLoaderStore()
+    const { showModal } = useSelector(SEL_showModal)
     const router = useRouter()
+    const dispatch = useDispatch();
 
     const HandleLogout = async () => {
-        setShowLoader(true)
+        dispatch(loaderActions.setShowLoader(true));
 
         try {
             signOut({
                 callbackUrl: "/",
                 redirect: false
             })
-            deleteUser()
-            onClose()
-            setShowSidebar(false)
+            dispatch(userActions.clearUser())
+            dispatch(modalActions.close())
+            dispatch(sidebarActions.setShowSidebar(false))
 
             localStorage.removeItem("arms-anonymous-user")
             router.push("/")
@@ -39,11 +37,10 @@ const LogoutModal = () => {
         <Modal
             title='Confirm Logout'
             description='Confirm to Logout of ARMS?'
-            isOpen={isOpen === "LogoutModal"}
-            onClose={onClose}
+            isOpen={showModal === "LogoutModal"}
         >
             <div className="flex justify-between items-end gap-8 w-[20em] h-[5em]">
-                <Button variant="secondary" onClick={() => onClose()} className='flex_center gap-2 w-full'>
+                <Button variant="secondary" onClick={() => dispatch(modalActions.close())} className='flex_center gap-2 w-full'>
                     <X size={20} />
                     <span>Cancel</span>
                 </Button>

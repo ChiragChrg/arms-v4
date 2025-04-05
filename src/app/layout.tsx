@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Poppins } from "next/font/google"
 import './globals.css'
 import Provider from '@/providers/Provider';
+import ReduxProvider from '@/providers/ReduxProvider';
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -98,9 +99,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <Provider attribute="class" enableSystem storageKey='arms-theme'>
-          {children}
-        </Provider>
+        <ReduxProvider>
+          <Provider attribute="class" enableSystem storageKey='arms-theme'>
+            {children}
+          </Provider>
+        </ReduxProvider>
       </body>
     </html>
   )

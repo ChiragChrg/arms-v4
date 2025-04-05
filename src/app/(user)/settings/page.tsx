@@ -1,19 +1,21 @@
 "use client"
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import useUserStore from '@/store/useUserStore'
-import useModalStore from '@/store/useModalStore'
 import { Button } from '@/components/ui/button'
 import MobileHeader from '@/components/MobileHeader'
 
 import { HandlePWAInstall, deferredPrompt } from '@/lib/pwa'
 import { CircleLoader } from '@/components/CustomUI/Skeletons'
 import { User2, CheckIcon, LogOutIcon, MonitorSmartphoneIcon, TimerResetIcon } from 'lucide-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { SEL_User } from '@/store'
+import { modalActions } from '@/store/modalSlice/modalSlice'
 
 const Settings = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const { user, isAdmin } = useUserStore()
-    const { onOpen } = useModalStore()
+    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const dispatch = useDispatch();
+
 
     useEffect(() => {
         if (!user?.avatarImg)
@@ -95,7 +97,7 @@ const Settings = () => {
 
                     <Button
                         variant="destructive"
-                        onClick={() => onOpen("LogoutModal")}
+                        onClick={() => dispatch(modalActions.show("LogoutModal"))}
                         style={{ margin: !deferredPrompt ? "2em auto" : "" }}
                         className='flex_center gap-2 w-full sm:max-w-[300px]'>
                         <LogOutIcon />

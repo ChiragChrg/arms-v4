@@ -1,17 +1,20 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '../ui/dialog'
+import { useDispatch } from 'react-redux';
+import { modalActions } from '@/store';
 
 type Props = {
     title: string,
     description: string,
     isOpen: boolean,
-    onClose: () => void,
     children?: React.ReactNode,
 }
 
-const Modal = ({ title, description, isOpen, onClose, children }: Props) => {
+const Modal = ({ title, description, isOpen, children }: Props) => {
+    const dispatch = useDispatch();
+
     const onChange = (open: boolean) => {
-        if (!open) onClose()
+        if (!open) dispatch(modalActions.close())
     }
 
     return (

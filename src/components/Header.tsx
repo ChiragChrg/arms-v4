@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import useLoaderStore from '@/store/useLoaderStore'
 import { cn } from '@/lib/utils'
 import PWA from '@/lib/pwa'
 
 import ThemeButton from './CustomUI/ThemeButton'
 import { X } from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { loaderActions } from '@/store/loaderSlice/loaderSlice'
 
 const Logo = dynamic(() => import('@/assets/Icons/Logo'))
 const HamMenuSVG = dynamic(() => import('@/assets/Icons/HamMenuSVG'))
@@ -22,10 +23,10 @@ type Props = {
 }
 
 const Header = ({ altLogo = false, altColor = false, className = "", disableAuthRedirect = false }: Props) => {
-    const [showNav, setShowNav] = useState<boolean>(false)
-    const router = useRouter()
-    const { setShowLoader } = useLoaderStore()
-    const { status } = useSession()
+    const [showNav, setShowNav] = useState<boolean>(false);
+    const router = useRouter();
+    const { status } = useSession();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const isAnonymousUser = JSON.parse(localStorage.getItem('arms-anonymous-user') as string)
@@ -34,10 +35,10 @@ const Header = ({ altLogo = false, altColor = false, className = "", disableAuth
             router.push('/dashboard')
         } else if (status === "unauthenticated") {
             setTimeout(() => {
-                setShowLoader(false)
+                dispatch(loaderActions.setShowLoader(false));
             }, 2500)
         }
-    }, [router, disableAuthRedirect, status, setShowLoader])
+    }, [router, disableAuthRedirect, status, dispatch])
 
     useEffect(() => {
         if (showNav) {

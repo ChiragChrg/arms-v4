@@ -3,25 +3,25 @@ import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { useSession } from 'next-auth/react'
-import useSidebarStore from '@/store/useSidebarStore'
-import useUserStore from '@/store/useUserStore'
 
 import { CircleLoader } from './CustomUI/Skeletons'
 import { Button } from "./ui/button"
 import HamMenuSVG from '@/assets/Icons/HamMenuSVG'
 import { ArrowLeftIcon, User2 } from 'lucide-react'
+import { useDispatch, useSelector } from "react-redux"
+import { SEL_User, sidebarActions } from "@/store"
 
 const MobileHeader = () => {
-    const { user } = useUserStore()
-    const { setShowSidebar } = useSidebarStore()
+    const { userData: user } = useSelector(SEL_User);
     const { status } = useSession()
     const router = useRouter()
     const pathname = usePathname()
+    const dispatch = useDispatch()
 
     return (
         <div className="flex lg:hidden justify-between items-center mb-4">
             <div className="flex_center gap-4">
-                <div onClick={() => setShowSidebar(true)} >
+                <div onClick={() => dispatch(sidebarActions.setShowSidebar(true))} >
                     <HamMenuSVG size="40" className='lg:hidden text-logoClr dark:text-white' />
                 </div>
 
