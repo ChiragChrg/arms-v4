@@ -4,12 +4,15 @@ import { RootState } from "@/store/store";
 
 const initialState = {
     userData: {
-        uid: "",
-        username: "",
+        id: "",
+        name: "",
         email: "",
-        avatarImg: "",
+        image: null,
+        emailVerified: false,
         isApproved: false,
-        accessToken: ""
+        createdAt: null,
+        updatedAt: null,
+        accessToken: "",
     },
     isAdmin: false,
     isLoading: true,
@@ -21,7 +24,7 @@ const userSlice = createSlice({
     reducers: {
         setUser: (state, action: PayloadAction<UserTypes>) => {
             state.userData = action.payload;
-            state.isAdmin = action.payload.uid === process.env.NEXT_PUBLIC_ARMS_ADMIN_UID;
+            state.isAdmin = action.payload.id === process.env.NEXT_PUBLIC_ARMS_ADMIN_UID;
         },
         clearUser: (state) => {
             state.userData = initialState.userData;

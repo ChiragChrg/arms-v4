@@ -12,6 +12,7 @@ import { LogOutIcon } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { modalActions, SEL_User, userActions } from '@/store'
 import { loaderActions } from '@/store/loaderSlice/loaderSlice'
+import { UserTypes } from '@/store/types'
 
 const UserAvatar = () => {
     const { userData: user } = useSelector(SEL_User);
@@ -26,13 +27,17 @@ const UserAvatar = () => {
         if (isAnonymousUser) {
             // Set a dummy Anonymous user info
             const formattedUser = {
-                uid: "anonymous",
-                username: "Student",
+                id: "anonymous",
+                name: "Student",
                 email: "Anomymous User",
-                avatarImg: "",
+                image: "",
+                emailVerified: false,
                 isApproved: false,
+                createdAt: null,
+                updatedAt: null,
                 accessToken: "",
             }
+
             dispatch(userActions.setUser(formattedUser))
             dispatch(userActions.setIsLoading(false))
 
@@ -40,15 +45,19 @@ const UserAvatar = () => {
                 dispatch(loaderActions.setShowLoader(false));
 
             }, 2500)
-        } else if (status == "authenticated" && session !== null) {
+        } else if (status == "authenticated" && session.user) {
             const formattedUser = {
-                uid: session?.user?.uid ?? '',
-                username: session?.user?.name as string,
-                email: session?.user?.email as string,
-                avatarImg: session?.user?.avatarImg ?? '',
-                isApproved: session?.user?.isApproved ?? false,
-                accessToken: session?.user?.accessToken ?? '',
-            }
+                id: session.user.id,
+                name: session.user.name,
+                email: session.user.email,
+                image: session.user.image,
+                emailVerified: session.user.emailVerified,
+                isApproved: session.user.isApproved,
+                createdAt: session.user.createdAt,
+                updatedAt: session.user.updatedAt,
+                accessToken: session.user.accessToken,
+            } as UserTypes
+
             dispatch(userActions.setUser(formattedUser))
             dispatch(userActions.setIsLoading(false))
 
@@ -62,7 +71,7 @@ const UserAvatar = () => {
 
     return (
         <div className="flex justify-between items-center gap-2 w-full p-1 rounded text-white bg-primary/50 dark:bg-sidebarLinkClr drop-shadow-md">
-            <AvatarImage url={user?.avatarImg} />
+            <AvatarImage url={user.image} />
 
             <div className="flex_center flex-col w-full max-w-[9.5em]">
                 {status == "loading" ?
@@ -72,8 +81,8 @@ const UserAvatar = () => {
                     </>
                     :
                     <>
-                        <h2 className="text-[0.95em]">{user?.username}</h2>
-                        <span className='opacity-80 text-[0.6em] tracking-wider'>{user?.email}</span>
+                        <h2 className="text-[0.95em]">{user.name}</h2>
+                        <span className='opacity-80 text-[0.6em] tracking-wider'>{user.email}</span>
                     </>
                 }
             </div>

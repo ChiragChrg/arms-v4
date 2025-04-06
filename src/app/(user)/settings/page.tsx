@@ -18,9 +18,9 @@ const Settings = () => {
 
 
     useEffect(() => {
-        if (!user?.avatarImg)
+        if (!user?.image)
             setIsLoading(false)
-    }, [user?.avatarImg])
+    }, [user.image])
 
     return (
         <section className='section_style'>
@@ -31,9 +31,9 @@ const Settings = () => {
                 <div className="relative">
                     <div className="flex_center w-[125px] aspect-square rounded-full overflow-hidden">
                         <CircleLoader size='125px' className={isLoading ? 'block' : "hidden"} />
-                        {user?.avatarImg ?
+                        {user?.image ?
                             <Image
-                                src={user?.avatarImg}
+                                src={user.image}
                                 alt='User_Avatar'
                                 width={125}
                                 height={125}
@@ -51,19 +51,19 @@ const Settings = () => {
                 </div>
 
                 <div className="text-center">
-                    <h2 className='font-medium text-[1.4em]'>{user?.username}</h2>
-                    <span className="opacity-80">{user?.email}</span>
+                    <h2 className='font-medium text-[1.4em]'>{user.name}</h2>
+                    <span className="opacity-80">{user.email}</span>
                 </div>
             </div>
 
             <div className="flex flex-col gap-4 max-w-[600px] mx-auto mt-6">
                 <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px]">Username</div>
-                    <div className="w-full pl-8 overflow-hidden overflow-ellipsis">{user?.username}</div>
+                    <div className="w-full pl-8 overflow-hidden overflow-ellipsis">{user.name}</div>
                 </div>
                 <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px] ">Email</div>
-                    <div className="w-full pl-8 overflow-hidden overflow-ellipsis">{user?.email}</div>
+                    <div className="w-full pl-8 overflow-hidden overflow-ellipsis">{user.email}</div>
                 </div>
                 <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px]">Role</div>

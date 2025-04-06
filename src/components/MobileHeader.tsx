@@ -37,9 +37,9 @@ const MobileHeader = () => {
 
             <Link href="/settings" className="flex_center w-fit aspect-square rounded-full overflow-hidden">
                 <CircleLoader size='40px' className={status == "loading" ? 'block' : "hidden"} />
-                {user?.avatarImg ?
+                {user.image ?
                     <Image
-                        src={user?.avatarImg}
+                        src={user.image}
                         alt='User_Avatar'
                         width={40}
                         height={40}

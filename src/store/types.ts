@@ -1,11 +1,14 @@
 // User types
 export interface UserTypes {
-    uid: string,
-    username: string,
-    email: string,
-    avatarImg: string,
-    isApproved: boolean,
-    accessToken: string,
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    emailVerified: boolean;
+    isApproved: boolean;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    accessToken: string;
 }
 
 export type UserState = {
