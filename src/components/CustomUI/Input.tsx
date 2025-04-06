@@ -1,7 +1,7 @@
 'use client'
 import { cn } from "@/lib/utils"
 import { AtSignIcon, EyeIcon, EyeOffIcon, User2Icon } from "lucide-react"
-import { useState, SetStateAction, Dispatch } from "react"
+import { useState } from "react"
 
 interface InputProps {
     label: string,
@@ -10,11 +10,11 @@ interface InputProps {
     placeholder?: string,
     className?: string,
     required?: boolean,
-    setValue?: Dispatch<SetStateAction<any>>
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
 
-const Input = ({ label, type = "text", name = "", placeholder, className = "", required = false, setValue }: InputProps) => {
+const Input = ({ label, type = "text", name = "", placeholder, className = "", required = false, onChange }: InputProps) => {
     const [showPassword, setShowPassword] = useState<boolean>(false)
     const TogglePassword = () => {
         setShowPassword(prev => !prev)
@@ -32,7 +32,7 @@ const Input = ({ label, type = "text", name = "", placeholder, className = "", r
                     type={showPassword ? "text" : type}
                     placeholder={placeholder}
                     required={required}
-                    onChange={(e) => setValue && setValue(e.target.value)}
+                    onChange={onChange}
                     className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                 {type === "password" ?

@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/database"
 import { NextResponse } from "next/server"
 import UserModel from "@/models/UserModel"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 
 interface RequestBody {
     uid: string,

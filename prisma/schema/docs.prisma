@@ -1,4 +1,4 @@
-model Docs {
+model Institute {
     id            String   @id @default(auto()) @map("_id") @db.ObjectId
     instituteName String   @unique()
     description   String
@@ -18,7 +18,7 @@ model Course {
     subjects  Subject[]
     creator   User      @relation("CourseCreator", fields: [creatorId], references: [id])
     creatorId String    @db.ObjectId
-    docs      Docs      @relation(fields: [docsId], references: [id])
+    docs      Institute @relation(fields: [docsId], references: [id])
     docsId    String    @db.ObjectId
 }
 

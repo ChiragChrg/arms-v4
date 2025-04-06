@@ -23,11 +23,11 @@ model User {
   sessions      Session[]
   Authenticator Authenticator[]
 
-  DocsCreator    Docs[]    @relation("DocsCreator")
-  CourseCreator  Course[]  @relation("CourseCreator")
-  SubjectCreator Subject[] @relation("SubjectCreator")
-  UnitCreator    Unit[]    @relation("UnitCreator")
-  UnitDocCreator UnitDoc[] @relation("UnitDocCreator")
+  DocsCreator    Institute[] @relation("DocsCreator")
+  CourseCreator  Course[]    @relation("CourseCreator")
+  SubjectCreator Subject[]   @relation("SubjectCreator")
+  UnitCreator    Unit[]      @relation("UnitCreator")
+  UnitDocCreator UnitDoc[]   @relation("UnitDocCreator")
 }
 
 model Account {

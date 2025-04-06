@@ -51,7 +51,7 @@ export interface courseType {
     _id?: string
 }
 
-export interface DataStoreTypes {
+export interface instituteTypes {
     instituteName: string,
     description: string,
     registeredBy: {
