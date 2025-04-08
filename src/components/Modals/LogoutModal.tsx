@@ -39,13 +39,13 @@ const LogoutModal = () => {
             description='Confirm to Logout of ARMS?'
             isOpen={showModal === "LogoutModal"}
         >
-            <div className="flex justify-between items-end gap-8 w-[20em] h-[5em]">
-                <Button variant="secondary" onClick={() => dispatch(modalActions.close())} className='flex_center gap-2 w-full'>
+            <div className="flex justify-between items-end gap-8 w-full h-[5em]">
+                <Button variant="secondary" onClick={() => dispatch(modalActions.close())} className='flex items-center flex-1/2 gap-2'>
                     <X size={20} />
                     <span>Cancel</span>
                 </Button>
 
-                <Button variant="destructive" onClick={HandleLogout} className='flex_center gap-2 w-full text-white'>
+                <Button variant="destructive" onClick={HandleLogout} className='flex items-center flex-1/2 gap-2 text-white'>
                     <LogOutIcon size={20} />
                     <span>Logout</span>
                 </Button>

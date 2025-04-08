@@ -37,12 +37,12 @@ const ThemeButton = ({ size = 24, className = "" }: Props) => {
     }
 
     return (
-        <Button variant="ghost" size="icon"
-            className={cn("rounded-full bg-transparent border border-white/30 sm:hover:bg-white sm:hover:text-baseClr", className)}
+        <Button size="icon"
+            className={cn("size-10 rounded-full bg-transparent hover:!bg-transparent border border-white/30 sm:hover:bg-white text-white", className)}
             title={resolvedTheme === "dark" ? "Toggle Light Mode" : "Toggle Dark Mode"}
             onClick={HandleThemeToggle}>
-            <SunIcon size={size} className="dark:hidden" />
-            <MoonIcon size={size} className="hidden dark:block" />
+            <SunIcon className={`dark:hidden size-[${size}px]`} />
+            <MoonIcon className={`hidden dark:block size-[${size}px]`} />
         </Button>
     )
 }

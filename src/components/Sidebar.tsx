@@ -118,7 +118,8 @@ const Sidebar = () => {
                 </Link>
             </nav>
 
-            <div className="flex_center flex-col gap-4 w-full mt-auto">
+            <div className="flex_center flex-col gap-3 w-full mt-auto">
+                <div className="w-full h-[1px] bg-white/20"></div>
                 <UserAvatar />
             </div>
 

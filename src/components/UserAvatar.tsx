@@ -70,7 +70,7 @@ const UserAvatar = () => {
     }, [session, status, router, dispatch])
 
     return (
-        <div className="flex justify-between items-center gap-2 w-full p-1 rounded text-white bg-primary/50 dark:bg-sidebarLinkClr drop-shadow-md">
+        <div className="flex justify-between items-center gap-2 w-full rounded text-white">
             <AvatarImage url={user.image} />
 
             <div className="flex_center flex-col w-full max-w-[9.5em]">
@@ -88,14 +88,13 @@ const UserAvatar = () => {
             </div>
 
             <Button
-                variant="destructive"
                 size="icon"
                 onClick={() => dispatch(modalActions.show("LogoutModal"))}
                 className='deleteBtnBg'
                 name='Logout'
                 title='Logout'
                 disabled={status == "loading"}>
-                <LogOutIcon size={20} />
+                <LogOutIcon color='white' className='size-5' />
             </Button>
         </div>
     )

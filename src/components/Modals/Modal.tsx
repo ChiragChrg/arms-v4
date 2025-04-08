@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '../ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogOverlay } from '../ui/dialog'
 import { useDispatch } from 'react-redux';
 import { modalActions } from '@/store';
 
@@ -19,6 +19,7 @@ const Modal = ({ title, description, isOpen, children }: Props) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onChange}>
+            <DialogOverlay className='backdrop-blur-[4px]' />
             <DialogContent className='max-w-max'>
                 <DialogHeader>
                     <DialogTitle className='tracking-wider'>{title}</DialogTitle>

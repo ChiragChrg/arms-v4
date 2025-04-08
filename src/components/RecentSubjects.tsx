@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
-import useUserStore from '@/store/useUserStore'
+import { useSelector } from 'react-redux'
+import { SEL_User } from '@/store'
 
 type RecentTopicsType = {
     [key: string]: RecentDataType[]
@@ -16,10 +17,10 @@ type RecentDataType = {
 
 const RecentSubjects = () => {
     const [recentTopic, setRecentTopic] = useState<RecentDataType[]>([])
-    const { user } = useUserStore()
+    const { userData: user } = useSelector(SEL_User);
 
     useEffect(() => {
-        const userID = user?.uid as string
+        const userID = user.id as string
         const recentDataUsers: RecentTopicsType = JSON.parse(localStorage.getItem("arms-recents") as string) || []
         const userRecents = recentDataUsers[userID]
         setRecentTopic(userRecents)
