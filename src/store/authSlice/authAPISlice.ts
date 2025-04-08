@@ -2,15 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const authAPISlice = createApi({
     reducerPath: 'authAPISlice',
-    baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/auth' }),
     endpoints: (builder) => ({
-        login: builder.mutation({
-            query: (credentials) => ({
-                url: '/login',
-                method: 'POST',
-                body: credentials,
-            }),
-        }),
         register: builder.mutation({
             query: (formData) => ({
                 url: '/register',
@@ -31,12 +24,11 @@ export const authAPISlice = createApi({
                 method: 'POST',
                 body: { password },
             }),
-        })
+        }),
     }),
 });
 
 export const {
-    useLoginMutation,
     useRegisterMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
