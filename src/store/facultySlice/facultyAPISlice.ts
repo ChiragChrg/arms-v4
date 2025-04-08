@@ -3,21 +3,22 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const facultyAPISlice = createApi({
     reducerPath: 'facultyAPISlice',
-    baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/faculty' }),
     endpoints: (builder) => ({
         getAllFaculty: builder.query({
-            query: () => '/faculty/all',
+            query: () => '/all',
         }),
         getFacultyById: builder.query({
-            query: (id: string) => `/faculty/${id}`,
+            query: (id: string) => `/${id}`,
         }),
         getPendingApproval: builder.query({
-            query: () => '/faculty/pending-approval',
+            query: () => '/pending-approval',
         }),
         approveFaculty: builder.mutation({
             query: (facultyId) => ({
-                url: `/faculty/approve/${facultyId}`,
+                url: `/approve`,
                 method: 'POST',
+                body: { facultyId },
             }),
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
