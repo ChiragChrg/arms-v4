@@ -1,28 +1,35 @@
 import { Institute } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface AddInstitutionType {
-    formData: Record<string, unknown>;
+interface CreateInstitutionType {
+    instituteName: string,
+    instituteDesc: string,
+    creatorId: string
 }
 
 interface UpdateInstitutionType {
     id: string;
-    formData: Record<string, unknown>;
+    instituteName: string;
+    instituteDesc: string;
 }
 
 export const institutionAPISlice = createApi({
     reducerPath: "institutionAPISlice",
-    baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/api/institution" }),
     endpoints: (builder) => ({
         getAllInstitutions: builder.query({
-            query: () => "/institutions/all",
+            query: () => "/all",
         }),
         getInstitutionById: builder.query({
-            query: (id: string) => `/institutions/${id}`,
+            query: (id: string) => ({
+                url: "/",
+                method: "GET",
+                params: { id },
+            }),
         }),
         createInstitution: builder.mutation({
-            query: (formData: AddInstitutionType) => ({
-                url: "/institutions",
+            query: (formData: CreateInstitutionType) => ({
+                url: "/",
                 method: "POST",
                 body: formData,
             }),
@@ -40,17 +47,17 @@ export const institutionAPISlice = createApi({
             },
         }),
         updateInstitution: builder.mutation({
-            query: ({ id, formData }: UpdateInstitutionType) => ({
-                url: `/institutions/${id}`,
+            query: (formData: UpdateInstitutionType) => ({
+                url: `/`,
                 method: "PUT",
                 body: formData,
             }),
-            onQueryStarted: async ({ id, formData }, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     institutionAPISlice.util.updateQueryData("getAllInstitutions", undefined, (draft) => {
-                        const index = draft.findIndex((institution: Institute) => institution.id === id);
+                        const index = draft.findIndex((institution: Institute) => institution.id === arg.id);
                         if (index !== -1) {
-                            draft[index] = { ...draft[index], ...formData };
+                            draft[index] = { ...draft[index], ...arg };
                         }
                     })
                 );
@@ -63,8 +70,9 @@ export const institutionAPISlice = createApi({
         }),
         deleteInstitution: builder.mutation({
             query: (id: string) => ({
-                url: `/institutions/${id}`,
+                url: `/`,
                 method: "DELETE",
+                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
