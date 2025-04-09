@@ -7,14 +7,14 @@ export async function GET() {
             prisma.institute.count(),
             prisma.course.count(),
             prisma.subject.count(),
-            prisma.unitDoc.count()
+            prisma.document.count()
         ]);
 
         const counts = {
             institute: res[0],
             course: res[1],
             subject: res[2],
-            unitDoc: res[3],
+            document: res[3],
         }
 
         return NextResponse.json(counts, { status: 200 })
