@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '../ui/button'
 import toast from 'react-hot-toast'
 import { Loader2Icon, MoreVerticalIcon, Trash2Icon, XIcon } from 'lucide-react'
@@ -22,19 +21,24 @@ import {
     DialogFooter,
     DialogClose
 } from "@/components/ui/dialog"
-import { deleteUser } from '@/app/actions/UserActions'
+import { useDeleteFacultyMutation } from '@/store'
 
 type Props = {
     facultyName: string,
-    facultyUid: string,
+    facultyId: string,
 }
 
-const ManageFaculty = ({ facultyName, facultyUid }: Props) => {
+const ManageFaculty = ({ facultyName, facultyId }: Props) => {
     const [open, setOpen] = useState<boolean>(false)
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const queryClient = useQueryClient()
 
+    // Delete Faculty Mutation Handler
+    const [deleteFaculty, { isLoading }] = useDeleteFacultyMutation();
+
+    /**
+     * Compare the input value with the expected text to enable/disable the delete button.
+     * @param value - The input value from the user.
+     */
     const compareText = (value: string) => {
         if (value === `Delete ${facultyName}`)
             setIsDisabled(false)
@@ -42,13 +46,13 @@ const ManageFaculty = ({ facultyName, facultyUid }: Props) => {
             setIsDisabled(true)
     }
 
+    // Handle Delete Faculty
     const handleDeleteUser = async () => {
-        setIsLoading(true)
         setIsDisabled(true)
         try {
-            const res = await deleteUser(facultyUid)
+            const res = await deleteFaculty(facultyId).unwrap();
 
-            if (res?.status === 201) {
+            if (res?.status === 200) {
                 toast.success(`Faculty deleted successfully!`)
                 setOpen(false)
             }
@@ -56,8 +60,6 @@ const ManageFaculty = ({ facultyName, facultyUid }: Props) => {
             console.log(err)
             toast.error(`Error while deleting Faculty`)
         } finally {
-            await queryClient.invalidateQueries({ queryKey: ["facultyList"] })
-            setIsLoading(false)
             setIsDisabled(false)
         }
     }

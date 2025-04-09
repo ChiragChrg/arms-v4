@@ -1,13 +1,18 @@
 "use client"
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import axios from 'axios'
-import { useQuery } from '@tanstack/react-query'
-import useUserStore from '@/store/useUserStore'
-import MobileHeader from '@/components/MobileHeader'
+import { SEL_User, useGetAllFacultyQuery } from '@/store'
+import { useSelector } from 'react-redux'
+import { UserTypes } from '@/store/types'
+import { formatDate } from '@/utils/commonUtils'
+
+import toast from 'react-hot-toast'
 import { User2, UserCheck } from 'lucide-react'
+import MobileHeader from '@/components/MobileHeader'
+import AvatarImage from '@/components/CustomUI/AvatarImage'
+import ManageFaculty from '@/components/CustomUI/ManageFaculty'
 
 import {
     Table,
@@ -17,37 +22,24 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import AvatarImage from '@/components/CustomUI/AvatarImage'
-import ManageFaculty from '@/components/CustomUI/ManageFaculty'
-
-interface FacultyType {
-    _id: string,
-    username: string,
-    email: string,
-    avatarImg: string,
-    isApproved: boolean,
-    createdAt: string,
-}
 
 const Faculty = () => {
-    const { isAdmin, isLoading } = useUserStore()
+    const { isAdmin, isLoading } = useSelector(SEL_User);
     const router = useRouter()
 
     // Redirect NON-ADMIN users back to dashboard
     useLayoutEffect(() => {
         if (!isLoading && !isAdmin) {
-            router.push("/dashboard")
+            toast.error("Unauthorized Access!")
+            router.replace("/dashboard")
         }
     }, [isAdmin, router, isLoading])
 
-    const { data } = useQuery({
-        queryKey: ["facultyList"],
-        queryFn: async () => {
-            const { data } = await axios.get("/api/get/faculty")
-            const reqUserCount: number = data?.filter((user: FacultyType) => user?.isApproved === false).length;
-            return { faculties: data as FacultyType[], reqUserCount }
-        }
-    })
+    // Fetch all faculty data
+    const { data: facultyList } = useGetAllFacultyQuery(undefined, {});
+
+    // Pending Approval Count
+    const pendingApprovalCount = useMemo(() => facultyList?.filter((faculty: UserTypes) => !faculty?.isApproved).length || 0, [facultyList])
 
     if (isAdmin)
         return (
@@ -65,8 +57,8 @@ const Faculty = () => {
                             <UserCheck />
                             <span className='hidden sm:block'>Pending</span>
                             <div className='relative flex_center gap-2'>Request
-                                {data?.reqUserCount != 0 &&
-                                    <span className='flex_center w-6 aspect-square rounded-full bg-white text-primary font-bold text-[0.7em]'>{data?.reqUserCount}</span>}
+                                {pendingApprovalCount != 0 &&
+                                    <span className='flex_center w-6 aspect-square rounded-full bg-white text-primary font-bold text-[0.7em]'>{pendingApprovalCount}</span>}
                             </div>
                         </Link>
                     }
@@ -83,27 +75,22 @@ const Faculty = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data?.faculties?.map((faculty, index) => {
-                            if (!faculty?.isApproved) return
-
-                            // Date Formating
-                            const date = new Date(faculty?.createdAt);
-                            const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
-                            const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
-                            const hideActionBtn = faculty?._id !== process.env.NEXT_PUBLIC_ARMS_ADMIN_UID
+                        {facultyList?.map((faculty, index) => {
+                            if (!faculty.isApproved) return
+                            const showActionBtn = faculty.id === process.env.NEXT_PUBLIC_ARMS_ADMIN_UID
 
                             return (
                                 <TableRow key={index}>
                                     <TableCell className="px-2 sm:px-4 py-2 flex items-center gap-3">
-                                        <AvatarImage url={faculty?.avatarImg} size={40} />
-                                        <span className='font-medium capitalize'>{faculty?.username}</span>
+                                        <AvatarImage url={faculty.image} size={40} />
+                                        <span className='font-medium capitalize'>{faculty.name}</span>
                                     </TableCell>
-                                    <TableCell className="px-2 sm:px-4 py-2">{faculty?.email}</TableCell>
-                                    <TableCell className='px-2 sm:px-4 py-2 sm:table-cell'>{formattedDate}</TableCell>
+                                    <TableCell className="px-2 sm:px-4 py-2">{faculty.email}</TableCell>
+                                    <TableCell className='px-2 sm:px-4 py-2 sm:table-cell'>{formatDate(faculty.createdAt)}</TableCell>
                                     <TableCell className='px-2 sm:px-4 py-2 sm:table-cell text-center'>
-                                        {hideActionBtn && <ManageFaculty
-                                            facultyName={faculty?.username}
-                                            facultyUid={faculty?._id}
+                                        {showActionBtn && <ManageFaculty
+                                            facultyName={faculty.name}
+                                            facultyId={faculty.id}
                                         />}
                                     </TableCell>
                                 </TableRow>
@@ -114,16 +101,16 @@ const Faculty = () => {
 
                 {/* Card Ui for Mobile screen */}
                 <div className="grid xl:hidden grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    {data?.faculties?.map((faculty, index) => {
-                        if (!faculty?.isApproved) return
-                        const hideActionBtn = faculty?._id !== process.env.NEXT_PUBLIC_ARMS_ADMIN_UID
+                    {facultyList?.map((faculty, index) => {
+                        if (!faculty.isApproved) return
+                        const showActionBtn = faculty.id === process.env.NEXT_PUBLIC_ARMS_ADMIN_UID;
 
                         return (
                             <div key={index} className="flex justify-between items-center border border-secondary rounded-md px-1 py-0.5">
                                 <div className="flex items-center gap-4">
-                                    {faculty?.avatarImg ?
+                                    {faculty.image ?
                                         <Image
-                                            src={faculty?.avatarImg}
+                                            src={faculty.image}
                                             alt='User_Avatar'
                                             width={40}
                                             height={40}
@@ -137,14 +124,14 @@ const Faculty = () => {
                                     }
 
                                     <div className="flex flex-col">
-                                        <span className='font-medium capitalize'>{faculty?.username}</span>
-                                        <span className='text-[0.8em] opacity-80'>{faculty?.email}</span>
+                                        <span className='font-medium capitalize'>{faculty.name}</span>
+                                        <span className='text-[0.8em] opacity-80'>{faculty.email}</span>
                                     </div>
                                 </div>
 
-                                {hideActionBtn && <ManageFaculty
-                                    facultyName={faculty?.username}
-                                    facultyUid={faculty?._id}
+                                {showActionBtn && <ManageFaculty
+                                    facultyName={faculty.name}
+                                    facultyId={faculty.id}
                                 />}
                             </div>
                         )

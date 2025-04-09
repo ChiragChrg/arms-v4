@@ -1,29 +1,58 @@
-import { User } from '@prisma/client';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { UserTypes } from '../types';
+
+type ApproveFacultyType = {
+    facultyId: string;
+    approval: "approve" | "reject";
+};
 
 export const facultyAPISlice = createApi({
     reducerPath: 'facultyAPISlice',
     baseQuery: fetchBaseQuery({ baseUrl: '/api/faculty' }),
     endpoints: (builder) => ({
-        getAllFaculty: builder.query({
+        getAllFaculty: builder.query<UserTypes[], undefined>({
             query: () => '/all',
         }),
-        getFacultyById: builder.query({
-            query: (id: string) => `/${id}`,
-        }),
-        getPendingApproval: builder.query({
-            query: () => '/pending-approval',
+        getFacultyById: builder.query<UserTypes, string>({
+            query: (id: string) => ({
+                url: "/",
+                method: "GET",
+                params: { id },
+            }),
         }),
         approveFaculty: builder.mutation({
-            query: (facultyId) => ({
+            query: (formData: ApproveFacultyType) => ({
                 url: `/approve`,
                 method: 'POST',
+                body: formData,
+            }),
+            onQueryStarted: async (formData, { dispatch, queryFulfilled }) => {
+                const patchResult = dispatch(
+                    facultyAPISlice.util.updateQueryData('getAllFaculty', undefined, (draft) => {
+                        const index = draft.findIndex((faculty: UserTypes) => faculty.id === formData.facultyId);
+                        if (index !== -1) {
+                            draft[index].isApproved = formData.approval === "approve";
+                        }
+                    })
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            },
+        }),
+        deleteFaculty: builder.mutation({
+            query: (facultyId) => ({
+                url: `/delete`,
+                method: 'DELETE',
                 body: { facultyId },
             }),
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
-                    facultyAPISlice.util.updateQueryData('getPendingApproval', undefined, (draft) => {
-                        const index = draft.findIndex((faculty: User) => faculty.id === arg);
+                    facultyAPISlice.util.updateQueryData('getAllFaculty', undefined, (draft) => {
+                        const index = draft.findIndex((faculty: UserTypes) => faculty.id === arg);
                         if (index !== -1) {
                             draft.splice(index, 1);
                         }
@@ -34,7 +63,7 @@ export const facultyAPISlice = createApi({
                 } catch {
                     patchResult.undo();
                 }
-            },
+            }
         }),
     }),
 });
@@ -42,6 +71,6 @@ export const facultyAPISlice = createApi({
 export const {
     useGetAllFacultyQuery,
     useGetFacultyByIdQuery,
-    useGetPendingApprovalQuery,
-    useApproveFacultyMutation
+    useApproveFacultyMutation,
+    useDeleteFacultyMutation,
 } = facultyAPISlice;

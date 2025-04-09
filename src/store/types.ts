@@ -3,8 +3,7 @@ export interface UserTypes {
     id: string;
     name: string;
     email: string;
-    image: string | null;
-    emailVerified: boolean;
+    image: string;
     isApproved: boolean;
     createdAt: Date | null;
     updatedAt: Date | null;
