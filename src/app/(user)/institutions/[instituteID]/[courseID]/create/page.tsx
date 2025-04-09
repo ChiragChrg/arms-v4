@@ -1,17 +1,19 @@
 "use client"
-import { FormEvent, useState } from 'react'
+import { FormEvent, useMemo, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import Image from "next/image"
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import toast from 'react-hot-toast'
+import { debounce } from 'lodash'
+import { useSelector } from 'react-redux'
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
+import { CourseTypes } from '@/store/types'
 import { Button } from '@/components/ui/button'
-import useUserStore from '@/store/useUserStore'
+import { SEL_User, useCreateSubjectMutation, useGetAllCoursesQuery } from '@/store'
+
+import toast from 'react-hot-toast'
 import { NewCourseVector } from '@/assets/SVGs'
-import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
+import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
 
 type Params = {
     instituteID: string,
@@ -22,53 +24,58 @@ const CreateSubject = () => {
     const [subjectName, setSubjectName] = useState<string>("")
     const [subjectDesc, setSubjectDesc] = useState<string>("")
     const [isInvalid, setIsInvalid] = useState<boolean>(false)
-    const { user } = useUserStore()
+
     const params = useParams<Params>()
     const router = useRouter()
-    const queryClient = useQueryClient()
 
-    const HandleCreateCourse = async (e: FormEvent<HTMLFormElement>) => {
+    // Get User Data
+    const { userData: user } = useSelector(SEL_User);
+    const { data: course } = useGetAllCoursesQuery({});
+
+    // Create Subject Mutation Handler
+    const [createSubject, { isLoading }] = useCreateSubjectMutation();
+
+    // Get Institute Data
+    const { id: courseId, courseName } = useMemo(() => {
+        return course?.find((obj: CourseTypes) => obj.courseName === params?.courseID.replaceAll("-", " ")) as CourseTypes;
+    }, [params?.courseID, course])
+
+    const HandleCreateSubject = async (e: FormEvent<HTMLFormElement>) => {
         e?.preventDefault()
-        const instituteName = params?.instituteID.replaceAll("-", " ");
-        const courseName = params?.courseID.replaceAll("-", " ");
+        if (isInvalid) return;
 
-        if (courseName.toLowerCase() === subjectName.toLowerCase())
-            throw new Error("Subject name cannot be same as course name!")
+        try {
+            if (courseName.toLowerCase() === subjectName.toLowerCase())
+                throw new Error("Subject name cannot be same as course name!")
 
-        const res = await axios.post("/api/post/create-subject", {
-            instituteName,
-            courseName,
-            subjectName,
-            subjectDesc,
-            registeredBy: user?.uid
-        })
-        return res
+            const res = await createSubject({
+                subjectName,
+                subjectDesc,
+                courseId,
+                creatorId: user.id
+            }).unwrap();
+
+            if (res.status === 201) {
+                toast.success("Subject Created Successfully!");
+                router.push(`/institutions/${params?.instituteID}/${params?.courseID}`);
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error: unknown) {
+            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
+            toast.error(errorMessage);
+        }
     }
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: HandleCreateCourse,
-        onError(error: any) {
-            console.log(error)
-            toast.error(`Error: ${error?.response?.data || "Something went wrong!"}`)
-        },
-        onSuccess: async () => {
-            toast.success("Subject Created Successfully!")
-            await queryClient.invalidateQueries()
-            router.push(`../${params?.courseID}`)
-        }
-    })
-
     // Check if subjectName matches the regex pattern
-    const handleChange = (event: { target: { value: any } }) => {
-        const { value } = event?.target;
-
-        if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-            setIsInvalid(false)
-            setSubjectName(value.trim());
+    const validateSubjectName = debounce((subjectName: string) => {
+        if (/^[a-zA-Z0-9\s]*$/.test(subjectName)) {
+            setIsInvalid(false);
+            setSubjectName(subjectName.trim());
         } else {
-            setIsInvalid(true)
+            setIsInvalid(true);
         }
-    };
+    }, 300);
 
     return (
         <section className='section_style'>
@@ -85,7 +92,7 @@ const CreateSubject = () => {
             </h1>
 
             <div className="flex justify-around items-center flex-col-reverse lg:flex-row gap-6 mt-24">
-                <form onSubmit={(e) => mutate(e)} className='flex flex-col gap-3 2xl:gap-4'>
+                <form onSubmit={HandleCreateSubject} className='flex flex-col gap-3 2xl:gap-4'>
                     <label className="relative min-w-[350px]">
                         <span className='text-[0.9em] bg-background/0 px-1'>Subject Name</span>
 
@@ -96,7 +103,7 @@ const CreateSubject = () => {
                                 type="text"
                                 required={true}
                                 placeholder='Enter Subject Name'
-                                onChange={handleChange}
+                                onChange={(e) => validateSubjectName(e?.target?.value)}
                                 className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                             <OpenBookSVG size="24" className="absolute right-2 text-slate-400" />
@@ -132,7 +139,7 @@ const CreateSubject = () => {
                             <input
                                 type="text"
                                 required={true}
-                                defaultValue={user?.username || ""}
+                                defaultValue={user.name || ""}
                                 disabled={true}
                                 className='text-[1em] w-full bg-background/0 text-slate-400 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
@@ -140,8 +147,8 @@ const CreateSubject = () => {
                         </div>
                     </label>
 
-                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isPending || isInvalid}>
-                        {isPending ?
+                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isLoading || isInvalid}>
+                        {isLoading ?
                             <Loader2Icon className='animate-spin' />
                             : <PlusIcon />
                         }
