@@ -4,7 +4,7 @@ import Header from '@/components/Header'
 import Trails from '@/components/Trails'
 import { SignupVector } from '@/assets/SVGs'
 
-const Signup = () => {
+const Register = () => {
     return (
         <main className='flex flex-col w-full h-screen px-4 py-3 overflow-hidden scalingZoom'>
             {/* Show colored Logo on mobile devies & vice versa */}
@@ -29,4 +29,4 @@ const Signup = () => {
     )
 }
 
-export default Signup
+export default Register
