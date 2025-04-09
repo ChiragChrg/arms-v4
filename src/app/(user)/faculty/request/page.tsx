@@ -1,43 +1,29 @@
-"use client"
+"use client";
+
 import { useLayoutEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import axios from 'axios'
-import useUserStore from '@/store/useUserStore'
+import { useSelector } from 'react-redux';
+import { SEL_User, useGetAllFacultyQuery } from '@/store';
+
+import UserCard from './UserCard'
 import MobileHeader from '@/components/MobileHeader'
-import { useQuery } from '@tanstack/react-query'
 import NavRoute from '@/components/NavRoutes'
 import { EmptyApprovalVector } from '@/assets/SVGs'
-import UserCard from './UserCard'
-
-
-export interface FacultyType {
-    _id: string,
-    username: string,
-    email: string,
-    avatarImg: string,
-    isApproved: boolean,
-    createdAt: string,
-}
 
 const Request = () => {
-    const { isAdmin } = useUserStore()
+    const { isAdmin } = useSelector(SEL_User);
     const router = useRouter()
 
     // Redirect NON-ADMIN users back to dashboard
     useLayoutEffect(() => {
         if (!isAdmin) {
-            router.push("/dashboard")
+            router.replace("/dashboard")
         }
     }, [isAdmin, router])
 
-    const { data: users } = useQuery({
-        queryKey: ["facultyRequestList"],
-        queryFn: async () => {
-            const { data } = await axios.get("/api/get/pending-approval")
-            return data as FacultyType[]
-        }
-    })
+    // Fetch Faculty Request List
+    const { data: FacultyList } = useGetAllFacultyQuery(undefined, {});
 
     if (isAdmin)
         return (
@@ -50,10 +36,10 @@ const Request = () => {
                     <span className="text-primary"> Request</span>
                 </h1>
 
-                {users?.length !== 0 ?
+                {FacultyList?.length !== 0 ?
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 my-4">
-                        {users?.map((user, index) => {
-                            if (user?.isApproved) return //if True return
+                        {FacultyList?.map((user, index) => {
+                            if (user?.isApproved) return;
 
                             return (
                                 <UserCard key={index} user={user} />

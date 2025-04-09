@@ -1,45 +1,37 @@
 import { Button } from '@/components/ui/button'
-import axios from 'axios'
 import { CheckIcon, Loader, User2, X } from 'lucide-react'
 import Image from 'next/image'
-import { FacultyType } from './page'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
+import { useApproveFacultyMutation } from '@/store'
+import { UserTypes } from '@/store/types'
 
 type Props = {
-    user: FacultyType
+    user: UserTypes
 }
 type MutationType = {
-    uid: string,
+    facultyId: string,
     approval: "approve" | "reject"
 }
 
 const UserCard = ({ user }: Props) => {
-    const queryClient = useQueryClient()
+    // Mutation to handle faculty approval/rejection
+    const [approveFaculty, { isLoading }] = useApproveFacultyMutation()
 
-    const HandleRequest = async ({ approval, uid }: MutationType) => {
-        const res = await axios.post("/api/post/manage-approval", { approval, uid })
-        return res
+    const handleApproval = async ({ facultyId, approval }: MutationType) => {
+        const res = await approveFaculty({ facultyId, approval }).unwrap();
+
+        if (res?.status === 200) {
+            toast.success(`Faculty ${approval}ed successfully!`)
+        } else {
+            toast.error("Something went wrong!")
+        }
     }
-
-    const { mutate, isPending } = useMutation({
-        mutationFn: HandleRequest,
-        onSuccess: async (data) => {
-            if (data?.data?.isUserApproved) {
-                toast.success("User Approved! 👍🏻")
-            } else {
-                toast.success("User Rejected! 🚫")
-            }
-
-            return await queryClient.invalidateQueries({ queryKey: ["facultyRequestList"] })
-        },
-    })
 
     return (
         <div className="flex_center flex-col gap-1 rounded-md py-4 bg-radialGradientDark dark:bg-radialGradientDark">
-            {user?.avatarImg ?
+            {user.image ?
                 <Image
-                    src={user?.avatarImg}
+                    src={user.image}
                     alt='User_Avatar'
                     width={80}
                     height={80}
@@ -52,14 +44,14 @@ const UserCard = ({ user }: Props) => {
                 </div>
             }
 
-            <h3 className='mt-2'>{user?.username}</h3>
-            <span className='text-[0.8em] opacity-80'>{user?.email}</span>
+            <h3 className='mt-2'>{user.name}</h3>
+            <span className='text-[0.8em] opacity-80'>{user.email}</span>
 
             <div className="flex_center gap-4 mt-2 w-full px-8">
                 <Button
-                    onClick={() => mutate({ approval: "approve", uid: user?._id })}
+                    onClick={() => handleApproval({ facultyId: user.id, approval: "approve" })}
                     className='flex_center gap-1 p-2 min-w-[90px] w-full h-fit text-[0.8em] bg-green-600 hover:bg-green-700 text-white drop-shadow'>
-                    {isPending ?
+                    {isLoading ?
                         <Loader size={20} className='animate-spin' />
                         :
                         <CheckIcon size={20} />}
@@ -68,9 +60,9 @@ const UserCard = ({ user }: Props) => {
 
                 <Button
                     variant="destructive"
-                    onClick={() => mutate({ approval: "reject", uid: user?._id })}
+                    onClick={() => handleApproval({ facultyId: user.id, approval: "reject" })}
                     className='flex_center deleteBtnBg gap-1 p-2 min-w-[90px] w-full h-fit text-[0.8em] text-white drop-shadow'>
-                    {isPending ?
+                    {isLoading ?
                         <Loader size={20} className='animate-spin' />
                         :
                         <X size={20} />
