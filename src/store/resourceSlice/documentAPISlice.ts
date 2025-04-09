@@ -1,34 +1,39 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { UnitDoc } from "@prisma/client";
+import { Document } from "@prisma/client";
+
+type CreateDocumentType = {
+    documentName: string;
+    documentDesc: string;
+    type: string;
+    size: string;
+    link: string;
+    unitId: string;
+    creatorId: string;
+};
+
+type UpdateDocumentType = {
+    id: string;
+    documentName: string;
+    documentDesc: string;
+};
 
 export const documentAPISlice = createApi({
     reducerPath: "documentAPISlice",
-    baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/document" }),
     endpoints: (builder) => ({
         getAllDocuments: builder.query({
-            query: () => "/documents/all",
+            query: () => "/all",
         }),
         getDocumentById: builder.query({
-            query: (id: string) => `/documents/${id}`,
-        }),
-        getDocumentByUnitId: builder.query({
-            query: (unitId: string) => `/documents/unit/${unitId}`,
-        }),
-        getDocumentBySubjectId: builder.query({
-            query: (subjectId: string) => `/documents/subject/${subjectId}`,
-        }),
-        getDocumentByCourseId: builder.query({
-            query: (courseId: string) => `/documents/course/${courseId}`,
-        }),
-        getDocumentByInstitutionId: builder.query({
-            query: (institutionId: string) => `/documents/institution/${institutionId}`,
-        }),
-        getDocumentByFacultyId: builder.query({
-            query: (facultyId: string) => `/documents/faculty/${facultyId}`,
+            query: (id: string) => ({
+                url: "/",
+                method: "GET",
+                params: { id },
+            }),
         }),
         createDocument: builder.mutation({
-            query: (formData) => ({
-                url: "/documents",
+            query: (formData: CreateDocumentType) => ({
+                url: "/",
                 method: "POST",
                 body: formData,
             }),
@@ -46,15 +51,15 @@ export const documentAPISlice = createApi({
             }
         }),
         updateDocument: builder.mutation({
-            query: ({ id, formData }) => ({
-                url: `/documents/${id}`,
+            query: (formData: UpdateDocumentType) => ({
+                url: `/`,
                 method: "PUT",
                 body: formData,
             }),
-            onQueryStarted: async ({ id, formData }, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async (formData, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     documentAPISlice.util.updateQueryData("getAllDocuments", undefined, (draft) => {
-                        const index = draft.findIndex((document: UnitDoc) => document.id === id);
+                        const index = draft.findIndex((document: Document) => document.id === formData.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...formData };
                         }
@@ -68,14 +73,15 @@ export const documentAPISlice = createApi({
             },
         }),
         deleteDocument: builder.mutation({
-            query: (id) => ({
-                url: `/documents/${id}`,
+            query: (id: string) => ({
+                url: `/`,
                 method: "DELETE",
+                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     documentAPISlice.util.updateQueryData("getAllDocuments", undefined, (draft) => {
-                        return draft.filter((document: UnitDoc) => document.id !== id);
+                        return draft.filter((document: Document) => document.id !== id);
                     })
                 );
                 try {
@@ -91,11 +97,6 @@ export const documentAPISlice = createApi({
 export const {
     useGetAllDocumentsQuery,
     useGetDocumentByIdQuery,
-    useGetDocumentByUnitIdQuery,
-    useGetDocumentBySubjectIdQuery,
-    useGetDocumentByCourseIdQuery,
-    useGetDocumentByInstitutionIdQuery,
-    useGetDocumentByFacultyIdQuery,
     useCreateDocumentMutation,
     useUpdateDocumentMutation,
     useDeleteDocumentMutation,
