@@ -1,36 +1,39 @@
-"use client"
+"use client";
+
 import { FormEvent, useState } from 'react'
 import Image from "next/image"
 import { useRouter } from 'next/navigation'
 import { send } from '@emailjs/browser'
-import axios from 'axios'
 import { ForgotPasswordVector } from '@/assets/SVGs'
 import Header from '@/components/Header'
 import Input from '@/components/CustomUI/Input'
 import { Button } from '@/components/ui/button'
 import toast from 'react-hot-toast'
 import { KeyRoundIcon, Loader2Icon } from 'lucide-react'
+import { useForgotPasswordMutation } from '@/store'
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState<string>("")
-    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+
+    // Forgot Password Mutation Handler
+    const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
     const HandleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setIsLoading(true)
 
         try {
-            const res = await axios.post("/api/post/forgot-password", { email })
+            const res = await forgotPassword({ email }).unwrap();
 
-            if (res.status === 201) {
-                //Sending Mail to User
-                let templateParams = {
-                    to_name: res.data.reset.username,
-                    to_email: res.data.reset.email,
-                    reset_link: res.data.reset.resetLink
+            if (res.status === 200) {
+                // Mail Template Parameters
+                const templateParams = {
+                    to_name: res.reset.name,
+                    to_email: res.reset.email,
+                    reset_link: res.reset.resetLink
                 }
 
+                //Sending Mail to User
                 const mailRes = await send(
                     process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID as string,
                     process.env.NEXT_PUBLIC_EMAILJS_PASSWPRD_RESET_TEMPLATE as string,
@@ -45,8 +48,6 @@ const ForgotPassword = () => {
             }
         } catch (error) {
             console.log(error)
-        } finally {
-            setIsLoading(false)
         }
     }
 
@@ -68,7 +69,7 @@ const ForgotPassword = () => {
                         label='Email'
                         placeholder='example@gmail.com'
                         className='block w-full 2xl:w-[600px]'
-                        setValue={setEmail} />
+                        onChange={(e) => setEmail(e.target.value)} />
 
                     <Button type='submit' className='w-full sm:max-w-[300px] flex_center gap-4 text-white' disabled={isLoading}>
                         {isLoading ?

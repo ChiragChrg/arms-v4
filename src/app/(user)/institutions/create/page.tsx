@@ -1,60 +1,59 @@
-"use client"
+"use client";
+
 import { FormEvent, useState } from 'react'
-import Image from "next/image"
 import { useRouter } from 'next/navigation'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
 import { Button } from '@/components/ui/button'
-import useUserStore from '@/store/useUserStore'
+import { debounce } from 'lodash';
+import { useSelector } from 'react-redux'
+import { SEL_User, useCreateInstitutionMutation } from '@/store'
+
+import toast from 'react-hot-toast'
+import Image from "next/image"
 import { NewInstituteVector } from '@/assets/SVGs'
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
-import axios from 'axios'
-import toast from 'react-hot-toast'
 
 const CreateInstitute = () => {
     const [instituteName, setInstituteName] = useState<string>("")
     const [instituteDesc, setInstituteDesc] = useState<string>("")
     const [isInvalid, setIsInvalid] = useState<boolean>(false)
-    const { user } = useUserStore()
     const router = useRouter()
-    const queryClient = useQueryClient()
+
+    // Get User Data
+    const { userData: user } = useSelector(SEL_User);
+
+    // Create Institute Mutation Handler
+    const [createInstitution, { isLoading }] = useCreateInstitutionMutation();
 
     const HandleCreateInstitute = async (e: FormEvent<HTMLFormElement>) => {
-        e?.preventDefault()
-        const res = await axios.post("/api/post/create-institute", {
+        e?.preventDefault();
+        if (isInvalid) return;
+
+        const res = await createInstitution({
             instituteName,
             instituteDesc,
-            registeredBy: user?.uid
-        })
-        return res
+            creatorId: user.id
+        }).unwrap();
+
+        if (res.status === 200) {
+            toast.success("Institute Created Successfully!")
+            router.push("/institutions")
+        } else {
+            toast.error(res.message)
+        }
     }
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: HandleCreateInstitute,
-        onError(error) {
-            console.log(error)
-            toast.error(`Error: ${error?.message || "Something went wrong!"}`)
-        },
-        onSuccess: async () => {
-            toast.success("Institution Created Successfully!")
-            await queryClient.invalidateQueries()
-            router.push("../institutions")
-        }
-    })
-
-    // Check if institutename matches the regex pattern
-    const handleChange = (event: { target: { value: any } }) => {
-        const { value } = event?.target;
-
-        if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-            setIsInvalid(false)
-            setInstituteName(value.trim());
+    // Check if institutename matches the regex pattern with debounce
+    const validateInstituteName = debounce((instituteName: string) => {
+        if (/^[a-zA-Z0-9\s]*$/.test(instituteName)) {
+            setIsInvalid(false);
+            setInstituteName(instituteName.trim());
         } else {
-            setIsInvalid(true)
+            setIsInvalid(true);
         }
-    };
+    }, 300);
 
     return (
         <section className='section_style'>
@@ -66,7 +65,7 @@ const CreateInstitute = () => {
             </h1>
 
             <div className="flex justify-around items-center flex-col-reverse lg:flex-row gap-6 mt-14">
-                <form onSubmit={(e) => mutate(e)} className='flex flex-col gap-3 2xl:gap-4'>
+                <form onSubmit={HandleCreateInstitute} className='flex flex-col gap-3 2xl:gap-4'>
                     <label className="relative min-w-[350px]">
                         <p className='text-[0.9em] bg-background/0 px-1'>Institute Name</p>
 
@@ -77,7 +76,7 @@ const CreateInstitute = () => {
                                 type="text"
                                 required={true}
                                 placeholder='Enter Institute Name'
-                                onChange={handleChange}
+                                onChange={(e) => validateInstituteName(e.target.value)}
                                 className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                             <BuildingSVG size="24" className="absolute right-2 text-slate-400" />
@@ -113,7 +112,7 @@ const CreateInstitute = () => {
                             <input
                                 type="text"
                                 required={true}
-                                defaultValue={user?.username || ""}
+                                defaultValue={user.name}
                                 disabled={true}
                                 className='text-[1em] w-full bg-background/0 text-slate-400 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
@@ -121,8 +120,8 @@ const CreateInstitute = () => {
                         </div>
                     </label>
 
-                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isPending || isInvalid}>
-                        {isPending ?
+                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isLoading || isInvalid}>
+                        {isLoading ?
                             <Loader2Icon className='animate-spin' />
                             : <PlusIcon />
                         }

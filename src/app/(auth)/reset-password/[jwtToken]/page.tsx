@@ -1,28 +1,53 @@
-"use client"
-import { FormEvent, useEffect, useState } from 'react'
+"use client";
+
+import { FormEvent, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from "next/image"
 import * as jose from "jose"
-import axios from 'axios'
 import toast from 'react-hot-toast'
 import Header from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import Input from '@/components/CustomUI/Input'
 import { KeyRoundIcon, Loader2Icon } from 'lucide-react'
 import { ResetPasswordVector } from '@/assets/SVGs'
+import { useResetPasswordMutation } from '@/store'
+
+type TokenType = {
+    jwtToken: string;
+}
+
+type DecodedToken = {
+    id: string,
+    name: string,
+    exp: number,
+}
 
 const ResetPassword = () => {
     const [password, setPassword] = useState<string>("")
     const [confirmpassword, setConfirmPassword] = useState<string>("")
-    const [isLoading, setIsLoading] = useState(false)
-
-    const { jwtToken } = useParams()
     const router = useRouter()
 
-    const decodedUrl = jose.decodeJwt(jwtToken as string)
-    if (!decodedUrl?.uid || !decodedUrl?.username) {
+    // Get JWT Token from URL
+    const { jwtToken }: TokenType = useParams()
+
+    // Reset Password Mutation Handler
+    const [resetPassword, { isLoading }] = useResetPasswordMutation()
+
+    // Decode JWT Token to get User ID and Name
+    const decodedToken = jose.decodeJwt(jwtToken) as Partial<DecodedToken>;
+    const { id, name, exp } = decodedToken;
+
+    // Check if the token is valid
+    if (!id || !name || !exp) {
         toast.error("Invalid Reset URL!")
         router.push("/")
+    }
+
+    // Check if the token is expired
+    const isExpired = exp ? (exp * 1000) < Date.now() : true;
+    if (isExpired) {
+        toast.error("Token Expired!")
+        router.push("/login")
     }
 
     const HandleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
@@ -35,13 +60,9 @@ const ResetPassword = () => {
         }
 
         const ResetToastID = toast.loading("Resetting Password...")
-        setIsLoading(true)
 
         try {
-            const res = await axios.post("/api/post/reset-password", {
-                uid: decodedUrl?.uid,
-                password
-            })
+            const res = await resetPassword({ id, password }).unwrap();
 
             if (res?.status === 201) {
                 toast.success("Password reset successful!", {
@@ -55,8 +76,6 @@ const ResetPassword = () => {
                 id: ResetToastID
             })
             console.log(err)
-        } finally {
-            setIsLoading(false)
         }
     }
 
@@ -68,7 +87,7 @@ const ResetPassword = () => {
                 <div className=" flex_center flex-col gap-8 mb-6 sm:mb-0 mt-4 sm:mt-0">
                     <h1 className='text-[1.6em] sm:text-[2.2em] font-bold text-center'>
                         Welcome
-                        <span className="text-primary"> {decodedUrl?.username as string}</span>
+                        <span className="text-primary">&nbsp;{name}</span>
                     </h1>
                     <Image src={ResetPasswordVector} alt='ResetPasswordVector' className='w-[80%] sm:w-[280px] 2xl:w-[350px]' priority={true} />
                 </div>
@@ -79,13 +98,13 @@ const ResetPassword = () => {
                         label='New password'
                         placeholder='Enter new password'
                         className='2xl:w-[500px]'
-                        setValue={setPassword} />
+                        onChange={(e) => setPassword(e.target.value)} />
                     <Input
                         type='password'
                         label='Confirm new password'
                         placeholder='Retype new password'
                         className='2xl:w-[500px]'
-                        setValue={setConfirmPassword} />
+                        onChange={(e) => setConfirmPassword(e.target.value)} />
 
                     <Button type='submit' className='flex_center gap-4 text-white' disabled={isLoading}>
                         {isLoading ?
