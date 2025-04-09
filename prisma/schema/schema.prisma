@@ -1,5 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
+  output          = "../../generated/prisma/client"
   previewFeatures = ["prismaSchemaFolder"]
 }
 
@@ -23,11 +24,11 @@ model User {
   sessions      Session[]
   Authenticator Authenticator[]
 
-  DocsCreator    Institute[] @relation("DocsCreator")
+  DocsCreator    Institute[] @relation("InstituteCreator")
   CourseCreator  Course[]    @relation("CourseCreator")
   SubjectCreator Subject[]   @relation("SubjectCreator")
   UnitCreator    Unit[]      @relation("UnitCreator")
-  UnitDocCreator UnitDoc[]   @relation("UnitDocCreator")
+  UnitDocCreator Document[]  @relation("DocumentCreator")
 }
 
 model Account {

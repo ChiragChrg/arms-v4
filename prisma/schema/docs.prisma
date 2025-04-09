@@ -5,7 +5,7 @@ model Institute {
     createdAt     DateTime @default(now()) @db.Date
 
     courses   Course[]
-    creator   User     @relation("DocsCreator", fields: [creatorId], references: [id])
+    creator   User     @relation("InstituteCreator", fields: [creatorId], references: [id])
     creatorId String   @db.ObjectId
 }
 
@@ -41,21 +41,23 @@ model Unit {
     unitDesc  String
     createdAt DateTime @default(now()) @db.Date
 
-    unitDocs  UnitDoc[]
-    creator   User      @relation("UnitCreator", fields: [creatorId], references: [id])
-    creatorId String    @db.ObjectId
-    subject   Subject   @relation(fields: [subjectId], references: [id])
-    subjectId String    @db.ObjectId
+    documents Document[]
+    creator   User       @relation("UnitCreator", fields: [creatorId], references: [id])
+    creatorId String     @db.ObjectId
+    subject   Subject    @relation(fields: [subjectId], references: [id])
+    subjectId String     @db.ObjectId
 }
 
-model UnitDoc {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    docName    String
-    docSize    String
-    docLink    String
-    docCreated DateTime @db.Date
+model Document {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    documentName String
+    documentDesc String
+    type         String
+    size         String
+    link         String
+    createdAt    DateTime @default(now()) @db.Date
 
-    creator   User   @relation("UnitDocCreator", fields: [creatorId], references: [id])
+    creator   User   @relation("DocumentCreator", fields: [creatorId], references: [id])
     creatorId String @db.ObjectId
     unit      Unit   @relation(fields: [unitId], references: [id])
     unitId    String @db.ObjectId
