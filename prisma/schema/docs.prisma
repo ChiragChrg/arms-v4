@@ -15,11 +15,11 @@ model Course {
     courseDesc String
     createdAt  DateTime @default(now()) @db.Date
 
-    subjects  Subject[]
-    creator   User      @relation("CourseCreator", fields: [creatorId], references: [id])
-    creatorId String    @db.ObjectId
-    docs      Institute @relation(fields: [docsId], references: [id])
-    docsId    String    @db.ObjectId
+    subjects    Subject[]
+    creator     User      @relation("CourseCreator", fields: [creatorId], references: [id])
+    creatorId   String    @db.ObjectId
+    institute   Institute @relation(fields: [instituteId], references: [id])
+    instituteId String    @db.ObjectId
 }
 
 model Subject {

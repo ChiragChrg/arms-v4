@@ -1,13 +1,13 @@
 import { Institute } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-interface CreateInstitutionType {
+type CreateInstitutionType = {
     instituteName: string,
     instituteDesc: string,
     creatorId: string
 }
 
-interface UpdateInstitutionType {
+type UpdateInstitutionType = {
     id: string;
     instituteName: string;
     instituteDesc: string;
@@ -15,7 +15,7 @@ interface UpdateInstitutionType {
 
 export const institutionAPISlice = createApi({
     reducerPath: "institutionAPISlice",
-    baseQuery: fetchBaseQuery({ baseUrl: "/api/institution" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/institution" }),
     endpoints: (builder) => ({
         getAllInstitutions: builder.query({
             query: () => "/all",

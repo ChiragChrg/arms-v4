@@ -37,7 +37,7 @@ export async function GET({ params }: Params) {
         return NextResponse.json(institution, { status: 200 });
     } catch (err) {
         console.error("Error fetching institution:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Uncaught Institution Error" }, { status: 500 });
     }
 }
 
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(newInstitution, { status: 201 });
     } catch (err) {
         console.error("Error creating institution:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Uncaught Institution Error" }, { status: 500 });
     }
 }
 
@@ -113,7 +113,7 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json(updatedInstitution, { status: 200 });
     } catch (err) {
         console.error("Error updating institution:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Uncaught Institution Error" }, { status: 500 });
     }
 }
 
@@ -139,6 +139,6 @@ export async function DELETE({ params }: Params) {
         return NextResponse.json({ message: "Institution deleted successfully" }, { status: 200 });
     } catch (err) {
         console.error("Error deleting institution:", err);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "Uncaught Institution Error" }, { status: 500 });
     }
 }

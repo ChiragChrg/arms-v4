@@ -1,19 +1,36 @@
 import { Course } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+type CreateCourseType = {
+    courseName: string,
+    courseDesc: string,
+    instituteId: string,
+    creatorId: string
+}
+
+type UpdateCourseType = {
+    id: string;
+    courseName: string;
+    courseDesc: string;
+}
+
 export const courseAPISlice = createApi({
     reducerPath: "courseAPISlice",
-    baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/course" }),
     endpoints: (builder) => ({
         getAllCourses: builder.query({
-            query: () => "/courses/all",
+            query: () => "/all",
         }),
         getCourseById: builder.query({
-            query: (id: string) => `/courses/${id}`,
+            query: (id: string) => ({
+                url: "/",
+                method: "GET",
+                params: { id },
+            }),
         }),
         createCourse: builder.mutation({
-            query: (formData) => ({
-                url: "/courses",
+            query: (formData: CreateCourseType) => ({
+                url: "/",
                 method: "POST",
                 body: formData,
             }),
@@ -31,17 +48,17 @@ export const courseAPISlice = createApi({
             }
         }),
         updateCourse: builder.mutation({
-            query: ({ id, formData }) => ({
-                url: `/courses/${id}`,
+            query: (formData: UpdateCourseType) => ({
+                url: `/`,
                 method: "PUT",
                 body: formData,
             }),
-            onQueryStarted: async ({ id, formData }, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     courseAPISlice.util.updateQueryData("getAllCourses", undefined, (draft) => {
-                        const index = draft.findIndex((course: Course) => course.id === id);
+                        const index = draft.findIndex((course: Course) => course.id === arg.id);
                         if (index !== -1) {
-                            draft[index] = { ...draft[index], ...formData };
+                            draft[index] = { ...draft[index], ...arg };
                         }
                     })
                 );
@@ -53,9 +70,10 @@ export const courseAPISlice = createApi({
             },
         }),
         deleteCourse: builder.mutation({
-            query: (id) => ({
-                url: `/courses/${id}`,
+            query: (id: string) => ({
+                url: `/`,
                 method: "DELETE",
+                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
