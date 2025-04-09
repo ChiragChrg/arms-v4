@@ -1,20 +1,20 @@
-"use client"
-import { useState } from 'react'
+"use client";
+
+import { useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEdgeStore } from '@/lib/edgestore';
-import { getInstitution } from '@/app/actions/DocsActions'
-import useUserStore from '@/store/useUserStore'
-import { DataStoreTypes } from '@/types/dataStoreTypes'
-import axios from 'axios'
+import { useSelector } from 'react-redux';
+import { UnitTypes } from '@/store/types';
+import { SEL_User, useCreateDocumentMutation, useGetAllUnitsQuery } from '@/store';
 
 import { MultiFileDropzone, type FileState } from './FileDropZone'
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
+
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
-import { BookOpenTextIcon, User2Icon } from 'lucide-react'
+import { BookOpenTextIcon } from 'lucide-react'
 import toast from 'react-hot-toast';
 
 type Params = {
@@ -25,40 +25,36 @@ type Params = {
 }
 
 type FileUploadRes = {
-    docName: string,
-    docSize: string,
-    docLink: string,
-    docUploader: string | null,
+    documentName: string;
+    type: string;
+    size: string;
+    link: string;
 }
 
 const UploadDocuments = () => {
-    const { user } = useUserStore()
-    const params = useParams<Params>()
-
     const [fileStates, setFileStates] = useState<FileState[]>([]);
     const [isUploadComplete, setIsUploadComplete] = useState<boolean>(false);
+
+    const params = useParams<Params>()
     const { edgestore } = useEdgeStore();
-    const queryClient = useQueryClient()
 
-    const { data: instituteData } = useQuery({
-        queryKey: ['getInstitutebyName', params?.unitID, "document-upload"],
-        queryFn: async () => {
-            try {
-                const instituteName = params?.instituteID?.replaceAll("-", " ");
-                const res = await getInstitution(instituteName) as DataStoreTypes;
-                return res;
-            } catch (error) {
-                console.error('Error fetching institutions:', error);
-                throw new Error('Failed to fetch institutions data');
-            }
-        },
-        initialData: () => {
-            const init = queryClient.getQueryData(['getInstitutebyName', params?.unitID]) as DataStoreTypes
-            return init
-        },
-        initialDataUpdatedAt: () => queryClient.getQueryState(['getInstitutebyName', params?.unitID])?.dataUpdatedAt,
-    });
+    // Get User Data
+    const { userData: user } = useSelector(SEL_User);
+    const { data: allUnits } = useGetAllUnitsQuery({});
 
+    // Get Current Unit Data
+    const unit = useMemo(() => {
+        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) as UnitTypes;
+    }, [params?.unitID, allUnits]);
+
+    // Create Documents Mutation Handler
+    const [createDocuments] = useCreateDocumentMutation();
+
+    /**
+     * Function to update the progress of a file upload
+     * @param key - The unique key of the file
+     * @param progress - The current progress of the file upload
+     */
     function updateFileProgress(key: string, progress: FileState['progress']) {
         setFileStates((fileStates) => {
             const newFileStates = structuredClone(fileStates);
@@ -74,10 +70,12 @@ const UploadDocuments = () => {
 
     // Uploading File
     const uploadFiles = async () => {
-        if (!user?.uid) return
+        if (!user.id) return
 
-        let uploadMeta: FileUploadRes[] = []
+        // File Upload Meta Data
+        const uploadMeta: FileUploadRes[] = []
 
+        // Uploading Files to Edgestore
         await Promise.all(
             fileStates.map(async (fileState) => {
                 try {
@@ -89,45 +87,38 @@ const UploadDocuments = () => {
                             updateFileProgress(fileState.key, progress);
                             if (progress === 100) {
                                 // wait 1 second to set it to complete
-                                // so that the user can see the progress bar
                                 await new Promise((resolve) => setTimeout(resolve, 1000));
                                 updateFileProgress(fileState.key, 'COMPLETE');
                             }
                         },
                     });
 
+                    // Adding file info to uploadMeta
                     uploadMeta.push({
-                        docName: fileState.file.name,
-                        docSize: res.size.toString(),
-                        docLink: res.url,
-                        docUploader: user?.uid
+                        documentName: fileState.file.name,
+                        type: fileState.file.type,
+                        size: `${(res.size / 1024).toFixed(2)} KB`,
+                        link: res.url,
                     })
                 } catch (err) {
                     updateFileProgress(fileState.key, 'ERROR');
-                    toast.error("Error while uploading files")
+                    toast.error("Error while uploading files");
+                    console.error(err);
                 }
             }),
         );
 
-        // Uploading File info to DB
-        const courseInfo = instituteData?.course?.find(obj => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase())
-        const subjectInfo = courseInfo?.subjects?.find(obj => obj?.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase())
-        const unitInfo = subjectInfo?.units?.find(obj => obj?.unitName.toLowerCase().replaceAll(" ", "-") === params?.unitID.toLowerCase())
-
+        // Upload Documents info to Database
         try {
-            const UploadRes = await axios.post("/api/post/upload-files", {
-                instituteId: instituteData?._id,
-                courseId: courseInfo?._id,
-                subjectId: subjectInfo?._id,
-                unitId: unitInfo?._id,
-                uploaderId: user?.uid,
-                FilesMeta: uploadMeta
-            })
+            const res = await createDocuments({
+                documentData: uploadMeta,
+                unitId: unit.id,
+                creatorId: user.id
+            }).unwrap();
 
-            if (UploadRes.status == 201) {
+            if (res.status == 201) {
                 setIsUploadComplete(true)
                 toast.success("Files uploaded successfully!")
-                await queryClient.invalidateQueries()
             }
         } catch (error) {
             setIsUploadComplete(true)

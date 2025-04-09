@@ -1,14 +1,13 @@
-"use client"
-import { useEffect, useState } from 'react'
+"use client";
+
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useParams, usePathname, useRouter } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams, usePathname } from 'next/navigation'
 import { useEdgeStore } from '@/lib/edgestore'
-import { getInstitution } from '@/app/actions/DocsActions'
-import useUserStore from '@/store/useUserStore'
-import { DataStoreTypes, courseType, subjectType, unitType } from '@/types/dataStoreTypes'
 import { getDownloadUrl } from '@edgestore/react/utils';
-import axios from 'axios'
+import { useSelector } from 'react-redux';
+import { SEL_User, useDeleteDocumentMutation, useGetAllUnitsQuery } from '@/store';
+import { UnitTypes } from '@/store/types';
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -57,41 +56,21 @@ type RecentDataType = {
 const UnitInfo = () => {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
-    const { user, isAdmin } = useUserStore()
     const pathname = usePathname()
     const params = useParams<Params>()
-    const router = useRouter()
     const { edgestore } = useEdgeStore();
-    const queryClient = useQueryClient()
 
-    const { data: unit, isError, isLoading } = useQuery({
-        queryKey: ['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID, params?.unitID],
-        queryFn: async () => {
-            try {
-                const instituteName = params?.instituteID?.replaceAll("-", " ");
-                const res = await getInstitution(instituteName) as DataStoreTypes;
-                const courseData = res?.course?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase())
-                const subjectData = courseData?.subjects?.find(obj => obj?.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) as subjectType
-                const unitData = subjectData?.units?.find(obj => obj?.unitName.toLowerCase().replaceAll(" ", "-") === params?.unitID.toLowerCase()) || {} as unitType
-                return unitData
-            } catch (error) {
-                console.error('Error fetching institutions:', error);
-                throw new Error('Failed to fetch institutions data');
-            }
-        },
-        initialData: () => {
-            const courseData = queryClient.getQueryData(['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID, params?.unitID]) as courseType
-            const subjectData = courseData?.subjects?.find(obj => obj?.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) as subjectType
-            const unitData = subjectData?.units?.find(obj => obj?.unitName.toLowerCase().replaceAll(" ", "-") === params?.unitID.toLowerCase()) as unitType
-            return unitData
-        },
-        initialDataUpdatedAt: () => queryClient.getQueryState(['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID, params?.unitID])?.dataUpdatedAt,
-    });
+    // Get User Data
+    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const { data: allUnits } = useGetAllUnitsQuery({});
 
-    if (isError) {
-        toast.error("Error while fetching Institute")
-        router.push(`/institutions/${params?.instituteID}/${params?.courseID}/${params?.subjectID}`)
-    }
+    // Get Current Unit Data
+    const unit = useMemo(() => {
+        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) as UnitTypes;
+    }, [params?.unitID, allUnits]);
+
+    // Delete Document Mutation Handler
+    const [deleteDocument, { isLoading }] = useDeleteDocumentMutation();
 
     // Add subject to Recents dash usin LocalStorage
     useEffect(() => {
@@ -103,7 +82,7 @@ const UnitInfo = () => {
             subtitle: `${params?.instituteID.replaceAll("-", " ")} / ${params?.courseID.replaceAll("-", " ")} / ${params?.subjectID.replaceAll("-", " ")} / ${params?.unitID.replaceAll("-", " ")}`
         }
 
-        const userID = user?.uid as string
+        const userID = user.id;
         const recentDataUsers: RecentDataType = JSON.parse(localStorage.getItem("arms-recents") as string) || []
         const recentData = recentDataUsers[userID]
 
@@ -118,7 +97,7 @@ const UnitInfo = () => {
             const oldData = recentData?.find((data) => data?.title === newData?.title)
             if (oldData) {
                 //if subject exists, move to top of array ie index 0
-                let filteredData = recentData.filter((data) => data?.title !== newData?.title) // remove old data
+                const filteredData = recentData.filter((data) => data?.title !== newData?.title) // remove old data
                 filteredData?.unshift(newData) // add back data to top index
 
                 recentDataUsers[userID] = filteredData
@@ -132,7 +111,7 @@ const UnitInfo = () => {
                 localStorage.setItem("arms-recents", JSON.stringify(recentDataUsers))
             }
         }
-    }, [unit, params, user?.uid])
+    }, [unit, params, user])
 
     // Deleting files
     const deleteFiles = async (urlToDelete: string, fileId: string) => {
@@ -142,17 +121,10 @@ const UnitInfo = () => {
                 url: urlToDelete,
             });
 
-            const res = await axios.delete('/api/delete/document', {
-                data: {
-                    instituteName: params?.instituteID.replaceAll("-", " ").toLowerCase(),
-                    courseName: params?.courseID.replaceAll("-", " ").toLowerCase(),
-                    subjectName: params?.subjectID.replaceAll("-", " ").toLowerCase(),
-                    unitName: params?.unitID.replaceAll("-", " ").toLowerCase(),
-                    documentID: fileId,
-                }
-            });
+            // Delete from database
+            const res = await deleteDocument(fileId).unwrap();
 
-            if (res.status == 200) {
+            if (res.status === 200) {
                 toast.success("Document Deleted 👍🏻", { id: deleteToast })
             }
         } catch (err) {
@@ -160,18 +132,16 @@ const UnitInfo = () => {
             toast.error("Error while Deleting Document", { id: deleteToast })
         } finally {
             setOpen(false)
-            // refetch and update data
-            await queryClient.invalidateQueries()
         }
     }
 
     // Grant DELETE access if user is ADMIN or the CREATOR
     useEffect(() => {
-        if (isAdmin || user?.uid === unit?.unitCreator?._id)
+        if (isAdmin || user.id === unit.creatorId)
             setIsAuthorized(true)
         else
             setIsAuthorized(false)
-    }, [user, isAdmin, unit?.unitCreator?._id])
+    }, [user, isAdmin, unit.creatorId])
 
     // Convert file url to a download link
     const handleDownload = async (fileUrl: string, fileName: string) => {
@@ -201,8 +171,8 @@ const UnitInfo = () => {
                     title='Unit'
                     toDeleteName={unit?.unitName as string}
                     isAuthorized={isAuthorized}
-                    userID={user?.uid as string}
-                    documentData={unit as unitType} />
+                    userID={user.id}
+                    documentData={unit} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">
@@ -224,7 +194,7 @@ const UnitInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Documents: {unit?.unitDocs?.length || 0}</span>
+                                <span>Documents: {unit.documents?.length || 0}</span>
                             </>
                             :
                             <>
@@ -239,8 +209,8 @@ const UnitInfo = () => {
                         <span>RegisteredBy : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={unit?.unitCreator?.avatarImg} size={25} />
-                                <span>{unit?.unitCreator?.username}</span>
+                                <AvatarImage url={unit.creator?.image} size={25} />
+                                <span>{unit.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">
@@ -274,7 +244,7 @@ const UnitInfo = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {unit?.unitDocs?.map((doc, index) => {
+                    {unit?.documents?.map((doc, index) => {
                         // File Size Formating
                         const formatDataSize = (bytes: number): string => {
                             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -288,20 +258,21 @@ const UnitInfo = () => {
                         };
 
                         // Date Formating
-                        const date = new Date(doc?.docCreated);
+                        const date = doc?.createdAt && new Date(doc.createdAt);
                         const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-                        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+                        const formattedDate = date ? new Intl.DateTimeFormat('en-US', options).format(date) : 'Invalid Date';
 
-                        const singleFileAccess = doc?.docUploader?._id === user?.uid
+                        // Check if user is the document uploader
+                        const isDocumentUploader = doc?.creatorId === user.id;
 
                         return (
                             <TableRow key={index}>
-                                <TableCell className="px-2 sm:px-4 py-2 font-medium capitalize">{doc?.docName}</TableCell>
-                                <TableCell className="px-2 sm:px-4 py-2 ">{formatDataSize(parseInt(doc?.docSize))}</TableCell>
+                                <TableCell className="px-2 sm:px-4 py-2 font-medium capitalize">{doc?.documentName}</TableCell>
+                                <TableCell className="px-2 sm:px-4 py-2 ">{formatDataSize(parseInt(doc?.size))}</TableCell>
                                 <TableCell className='px-2 sm:px-4 py-2 hidden sm:table-cell'>
                                     <div className="flex items-center gap-2">
-                                        <AvatarImage url={doc?.docUploader?.avatarImg} size={25} />
-                                        <span>{doc?.docUploader?.username}</span>
+                                        <AvatarImage url={doc.creator?.image} size={25} />
+                                        <span>{doc.creator?.name}</span>
                                     </div>
                                 </TableCell>
                                 <TableCell className='px-2 sm:px-4 py-2 sm:table-cell min-w-[70px]'>{formattedDate}</TableCell>
@@ -309,12 +280,12 @@ const UnitInfo = () => {
                                     <Button
                                         size='icon'
                                         title='Download'
-                                        onClick={() => handleDownload(doc?.docLink, doc?.docName)}
+                                        onClick={() => handleDownload(doc?.link, doc?.documentName)}
                                         className='flex_center bg-primary text-white rounded-md h-10 w-full p-2'>
                                         <DownloadCloudIcon />
                                     </Button>
 
-                                    {(isAuthorized || singleFileAccess) &&
+                                    {(isAuthorized || isDocumentUploader) &&
                                         <Dialog open={open} onOpenChange={setOpen}>
                                             <DialogTrigger asChild>
                                                 <Button
@@ -327,7 +298,7 @@ const UnitInfo = () => {
                                             </DialogTrigger>
                                             <DialogContent className='w-[90%] mx-auto rounded-md'>
                                                 <DialogHeader>
-                                                    <DialogTitle>Delete <span className='text-red-600'>{doc?.docName}</span> ?</DialogTitle>
+                                                    <DialogTitle>Delete <span className='text-red-600'>{doc?.documentName}</span> ?</DialogTitle>
                                                     <DialogDescription>
                                                         This action cannot be undone. This will permanently delete the document.
                                                     </DialogDescription>
@@ -342,7 +313,7 @@ const UnitInfo = () => {
 
                                                     <Button
                                                         variant="destructive"
-                                                        onClick={() => deleteFiles(doc?.docLink, doc?._id)}
+                                                        onClick={() => deleteFiles(doc?.link, doc?.id)}
                                                         className='flex_center gap-2 w-full text-white deleteBtnBg'>
                                                         <Trash2Icon size={20} />
                                                         <span>Delete</span>

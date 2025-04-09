@@ -1,12 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Document } from "@prisma/client";
 
-type CreateDocumentType = {
+type UploadDocumentType = {
     documentName: string;
-    documentDesc: string;
     type: string;
     size: string;
     link: string;
+}
+
+type CreateDocumentType = {
+    documentData: UploadDocumentType[];
     unitId: string;
     creatorId: string;
 };

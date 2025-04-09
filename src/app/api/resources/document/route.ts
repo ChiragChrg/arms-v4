@@ -5,12 +5,16 @@ type Params = {
     params: { id: string };
 };
 
-type CreateDocumentType = {
+type UploadDocumentType = {
     documentName: string;
     documentDesc: string;
     type: string;
     size: string;
     link: string;
+}
+
+type CreateDocumentType = {
+    documentData: UploadDocumentType[];
     unitId: string;
     creatorId: string;
 };
@@ -43,35 +47,31 @@ export async function GET({ params }: Params) {
 
 // Create Document
 export async function POST(request: NextRequest) {
-    const { documentName, documentDesc, type, size, link, unitId, creatorId }: CreateDocumentType = await request.json();
+    const { documentData, unitId, creatorId }: CreateDocumentType = await request.json();
 
     try {
-        if (!documentName || !documentDesc || !type || !size || !link || !unitId || !creatorId) {
+        if (documentData.length <= 0 || !unitId || !creatorId) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        // Check if the document already exists
-        const existingDocument = await prisma.document.findFirst({
-            where: { documentName },
-        });
+        // Create Multiple Documents
+        const createdDocuments = await Promise.all(
+            documentData.map((document) =>
+                prisma.document.create({
+                    data: {
+                        documentName: document.documentName,
+                        documentDesc: document.documentDesc,
+                        type: document.type,
+                        size: document.size,
+                        link: document.link,
+                        unitId,
+                        creatorId,
+                    },
+                })
+            )
+        );
 
-        if (existingDocument) {
-            return NextResponse.json({ error: "Document name already exists" }, { status: 400 });
-        }
-
-        const newDocument = await prisma.document.create({
-            data: {
-                documentName,
-                documentDesc,
-                type,
-                size,
-                link,
-                unitId,
-                creatorId,
-            },
-        });
-
-        return NextResponse.json(newDocument, { status: 201 });
+        return NextResponse.json(createdDocuments, { status: 201 });
     } catch (err) {
         console.error("Error creating document:", err);
         return NextResponse.json({ error: "Uncaught Document Error" }, { status: 500 });
