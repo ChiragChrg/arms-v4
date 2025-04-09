@@ -36,7 +36,7 @@ const Faculty = () => {
     }, [isAdmin, router, isLoading])
 
     // Fetch all faculty data
-    const { data: facultyList } = useGetAllFacultyQuery(undefined, {});
+    const { data: facultyList } = useGetAllFacultyQuery({});
 
     // Pending Approval Count
     const pendingApprovalCount = useMemo(() => facultyList?.filter((faculty: UserTypes) => !faculty?.isApproved).length || 0, [facultyList])

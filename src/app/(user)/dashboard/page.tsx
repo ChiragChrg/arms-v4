@@ -1,35 +1,23 @@
 "use client";
 
 import CountUp from "react-countup"
+import Link from 'next/link'
+import { useSession } from "next-auth/react";
+import { useGetDashboardCountQuery } from "@/store";
+
+import { AlertCircle } from "lucide-react"
 import MobileHeader from '@/components/MobileHeader'
 import RecentSubjects from "@/components/RecentSubjects"
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import DocumentsSVG from '@/assets/Icons/DocumentsSVG'
-import { AlertCircle } from "lucide-react"
-import { getDashCount } from '@/app/actions/DocsActions'
-import Link from 'next/link'
-import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
 
 const Dashboard = () => {
     const { data: session } = useSession();
-    const [count, setCount] = useState<Record<string, number>>({
-        institute: 0,
-        course: 0,
-        subject: 0,
-        unitDoc: 0
-    });
 
-    const fetchCount = useCallback(async () => {
-        const data = await getDashCount();
-        setCount(data || { institute: 0, course: 0, subject: 0, unitDoc: 0 });
-    }, []);
-
-    useEffect(() => {
-        fetchCount();
-    }, [fetchCount]);
+    // Get dashboard count data
+    const { data: count } = useGetDashboardCountQuery({});
 
     return (
         <section className='section_style'>
@@ -44,7 +32,7 @@ const Dashboard = () => {
                 <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <BuildingSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.institute || 0} duration={4} className='text-[2.5em] font-bold text-primary leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.institutes || 0} duration={4} className='text-[2.5em] font-bold text-primary leading-[1.5em] mr-4 z-[1]' />
                     </div>
                     <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Institutes registered</p>
                 </div>
@@ -52,7 +40,7 @@ const Dashboard = () => {
                 <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <BookStackSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.course || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.courses || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
                     </div>
                     <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Courses created</p>
                 </div>
@@ -60,7 +48,7 @@ const Dashboard = () => {
                 <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <OpenBookSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.subject || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.subjects || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
                     </div>
                     <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Subjects created</p>
                 </div>
@@ -68,7 +56,7 @@ const Dashboard = () => {
                 <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <DocumentsSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.unitDoc || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.documents || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
                     </div>
                     <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>PDFs uploaded</p>
                 </div>

@@ -10,7 +10,7 @@ export const facultyAPISlice = createApi({
     reducerPath: 'facultyAPISlice',
     baseQuery: fetchBaseQuery({ baseUrl: '/api/faculty' }),
     endpoints: (builder) => ({
-        getAllFaculty: builder.query<UserTypes[], undefined>({
+        getAllFaculty: builder.query<UserTypes[], unknown>({
             query: () => '/all',
         }),
         getFacultyById: builder.query<UserTypes, string>({
