@@ -1,17 +1,20 @@
-"use client"
-import { FormEvent, useState } from 'react'
+"use client";
+
+import { FormEvent, useMemo, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { InstitutionTypes } from '@/store/types'
 import Image from "next/image"
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
 import { Button } from '@/components/ui/button'
-import useUserStore from '@/store/useUserStore'
-import { NewCourseVector } from '@/assets/SVGs'
-import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
-import BookStackSVG from '@/assets/Icons/BookStackSVG'
-import axios from 'axios'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { debounce } from 'lodash'
+
 import toast from 'react-hot-toast'
+import { NewCourseVector } from '@/assets/SVGs'
+import BookStackSVG from '@/assets/Icons/BookStackSVG'
+import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
+import { SEL_User, useCreateCourseMutation, useGetAllInstitutionsQuery } from '@/store'
 
 type Params = {
     instituteID: string,
@@ -21,51 +24,52 @@ const CreateCourse = () => {
     const [courseName, setCourseName] = useState<string>("")
     const [courseDesc, setCourseDesc] = useState<string>("")
     const [isInvalid, setIsInvalid] = useState<boolean>(false)
-    const { user } = useUserStore()
     const params = useParams<Params>()
     const router = useRouter()
-    const queryClient = useQueryClient()
+
+    // Get User Data
+    const { userData: user } = useSelector(SEL_User);
+    const { data: institute } = useGetAllInstitutionsQuery({});
+
+    // Get Institute Data
+    const { id: instituteId, instituteName } = useMemo(() => {
+        return institute?.find((obj: InstitutionTypes) => obj.instituteName === params?.instituteID.replaceAll("-", " ")) as InstitutionTypes;
+    }, [params?.instituteID, institute])
+
+    // Create Course Mutation Handler
+    const [createCourse, { isLoading }] = useCreateCourseMutation();
 
     const HandleCreateCourse = async (e: FormEvent<HTMLFormElement>) => {
-        e?.preventDefault()
-        const instituteName = params?.instituteID.replaceAll("-", " ");
+        e?.preventDefault();
+        if (isInvalid) return;
 
         if (instituteName.toLowerCase() === courseName.toLowerCase())
             throw new Error("Course name cannot be same as institute name!")
 
-        const res = await axios.post("/api/post/create-course", {
-            instituteName,
+        const res = await createCourse({
             courseName,
             courseDesc,
-            registeredBy: user?.uid
-        })
-        return res
+            instituteId,
+            creatorId: user.id
+        }).unwrap();
+
+        if (res.status === 200) {
+            toast.success("Course Created Successfully!")
+            router.push(`/institutions/${params?.instituteID}`)
+        } else {
+            toast.error(res.message)
+        }
     }
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: HandleCreateCourse,
-        onError(error) {
-            console.log(error)
-            toast.error(`Error: ${error?.message || "Something went wrong!"}`)
-        },
-        onSuccess: async () => {
-            toast.success("Course Created Successfully!")
-            await queryClient.invalidateQueries()
-            router.push(`../${params?.instituteID}`)
-        }
-    })
-
     // Check if courseName matches the regex pattern
-    const handleChange = (event: { target: { value: any } }) => {
-        const { value } = event?.target;
-
-        if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-            setIsInvalid(false)
-            setCourseName(value.trim());
+    const validateCourseName = debounce((courseName: string) => {
+        if (/^[a-zA-Z0-9\s]*$/.test(courseName)) {
+            setIsInvalid(false);
+            setCourseName(courseName.trim());
         } else {
-            setIsInvalid(true)
+            setIsInvalid(true);
         }
-    };
+    }, 300);
 
     return (
         <section className='section_style'>
@@ -77,7 +81,7 @@ const CreateCourse = () => {
             </h1>
 
             <div className="flex justify-around items-center flex-col-reverse lg:flex-row gap-6 mt-20">
-                <form onSubmit={(e) => mutate(e)} className='flex flex-col gap-3 2xl:gap-4'>
+                <form onSubmit={HandleCreateCourse} className='flex flex-col gap-3 2xl:gap-4'>
                     <label className="relative min-w-[350px]">
                         <span className='text-[0.9em] bg-background/0 px-1'>Course Name</span>
 
@@ -88,7 +92,7 @@ const CreateCourse = () => {
                                 type="text"
                                 required={true}
                                 placeholder='Enter Course Name'
-                                onChange={handleChange}
+                                onChange={(e) => validateCourseName(e?.target?.value)}
                                 className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                             <BookStackSVG size="24" className="absolute right-2 text-slate-400" />
@@ -124,7 +128,7 @@ const CreateCourse = () => {
                             <input
                                 type="text"
                                 required={true}
-                                defaultValue={user?.username || ""}
+                                defaultValue={user.name}
                                 disabled={true}
                                 className='text-[1em] w-full bg-background/0 text-slate-400 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
@@ -132,8 +136,8 @@ const CreateCourse = () => {
                         </div>
                     </label>
 
-                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isPending || isInvalid}>
-                        {isPending ?
+                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isLoading || isInvalid}>
+                        {isLoading ?
                             <Loader2Icon className='animate-spin' />
                             : <PlusIcon />
                         }
