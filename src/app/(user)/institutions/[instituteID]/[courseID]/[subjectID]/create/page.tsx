@@ -1,16 +1,19 @@
-"use client"
-import { FormEvent, useState } from 'react'
+"use client";
+
+import { FormEvent, useMemo, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { debounce } from 'lodash'
 import Image from "next/image"
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
-import toast from 'react-hot-toast'
+import { Button } from '@/components/ui/button'
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
-import { Button } from '@/components/ui/button'
-import useUserStore from '@/store/useUserStore'
+import { SubjectTypes } from '@/store/types'
+import { SEL_User, useCreateUnitMutation, useGetAllSubjectsQuery } from '@/store'
+
+import toast from 'react-hot-toast'
 import { NewUnitVector } from '@/assets/SVGs'
 import { BookOpenTextIcon, Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
 
 type Params = {
     instituteID: string,
@@ -22,55 +25,57 @@ const CreateUnit = () => {
     const [unitName, setUnitName] = useState<string>("")
     const [unitDesc, setUnitDesc] = useState<string>("")
     const [isInvalid, setIsInvalid] = useState<boolean>(false)
-    const { user } = useUserStore()
     const params = useParams<Params>()
     const router = useRouter()
-    const queryClient = useQueryClient()
 
-    const HandleCreateCourse = async (e: FormEvent<HTMLFormElement>) => {
+    // Get User Data
+    const { userData: user } = useSelector(SEL_User);
+    const { data: subject } = useGetAllSubjectsQuery({});
+
+    // Get Subject Data
+    const { id: subjectId, subjectName } = useMemo(() => {
+        return subject?.find((obj: SubjectTypes) => obj.subjectName === params?.subjectID.replaceAll("-", " ")) as SubjectTypes;
+    }, [params?.subjectID, subject])
+
+    // Create Unit Mutation Handler
+    const [createUnit, { isLoading }] = useCreateUnitMutation();
+
+    const HandleCreateUnit = async (e: FormEvent<HTMLFormElement>) => {
         e?.preventDefault()
-        const instituteName = params?.instituteID.replaceAll("-", " ");
-        const courseName = params?.courseID.replaceAll("-", " ");
-        const subjectName = params?.subjectID.replaceAll("-", " ");
+        if (isInvalid) return;
 
-        if (subjectName.toLowerCase() === unitName.toLowerCase())
-            throw new Error("Unit name cannot be same as Subject name!")
+        try {
+            if (subjectName.toLowerCase() === unitName.toLowerCase())
+                throw new Error("Unit name cannot be same as Subject name!")
 
-        const res = await axios.post("/api/post/create-unit", {
-            instituteName,
-            courseName,
-            subjectName,
-            unitName,
-            unitDesc,
-            registeredBy: user?.uid
-        })
-        return res
+            const res = await createUnit({
+                unitName,
+                unitDesc,
+                subjectId,
+                creatorId: user.id
+            }).unwrap();
+
+            if (res.status === 201) {
+                toast.success("Unit Created Successfully!");
+                router.push(`/institutions/${params?.instituteID}/${params?.courseID}/${params?.subjectID}`);
+            } else {
+                throw new Error(res?.message || "Something went wrong!");
+            }
+        } catch (error: unknown) {
+            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
+            toast.error(errorMessage);
+        }
     }
 
-    const { mutate, isPending } = useMutation({
-        mutationFn: HandleCreateCourse,
-        onError(error) {
-            console.log(error)
-            toast.error(`Error: ${error?.message || "Something went wrong!"}`)
-        },
-        onSuccess: async () => {
-            toast.success("Unit Created Successfully!")
-            await queryClient.invalidateQueries()
-            router.push(`/institutions/${params?.instituteID}/${params?.courseID}/${params?.subjectID}`)
-        }
-    })
-
     // Check if unitName matches the regex pattern
-    const handleChange = (event: { target: { value: any } }) => {
-        const { value } = event?.target;
-
-        if (/^[a-zA-Z0-9\s]*$/.test(value)) {
-            setIsInvalid(false)
-            setUnitName(value.trim());
+    const validateUnitName = debounce((unitName: string) => {
+        if (/^[a-zA-Z0-9\s]*$/.test(unitName)) {
+            setIsInvalid(false);
+            setUnitName(unitName.trim());
         } else {
-            setIsInvalid(true)
+            setIsInvalid(true);
         }
-    };
+    }, 300);
 
     return (
         <section className='section_style'>
@@ -88,7 +93,7 @@ const CreateUnit = () => {
             </h1>
 
             <div className="flex justify-around items-center flex-col-reverse lg:flex-row gap-6 mt-24">
-                <form onSubmit={(e) => mutate(e)} className='flex flex-col gap-3 2xl:gap-4'>
+                <form onSubmit={HandleCreateUnit} className='flex flex-col gap-3 2xl:gap-4'>
                     <label className="relative min-w-[350px]">
                         <span className='text-[0.9em] bg-background/0 px-1'>Unit Name</span>
 
@@ -99,7 +104,7 @@ const CreateUnit = () => {
                                 type="text"
                                 required={true}
                                 placeholder='Enter Unit Name'
-                                onChange={handleChange}
+                                onChange={(e) => validateUnitName(e?.target?.value)}
                                 className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                             <BookOpenTextIcon size="24" className="absolute right-2 text-slate-400" />
@@ -135,7 +140,7 @@ const CreateUnit = () => {
                             <input
                                 type="text"
                                 required={true}
-                                defaultValue={user?.username || ""}
+                                defaultValue={user.name}
                                 disabled={true}
                                 className='text-[1em] w-full bg-background/0 text-slate-400 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
@@ -143,8 +148,8 @@ const CreateUnit = () => {
                         </div>
                     </label>
 
-                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isPending || isInvalid}>
-                        {isPending ?
+                    <Button type='submit' className='flex_center gap-4 text-white' disabled={isLoading || isInvalid}>
+                        {isLoading ?
                             <Loader2Icon className='animate-spin' />
                             : <PlusIcon />
                         }
