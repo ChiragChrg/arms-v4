@@ -1,19 +1,36 @@
 import { Subject } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+type CreateSubjectType = {
+    subjectName: string,
+    subjectDesc: string,
+    courseId: string,
+    creatorId: string
+}
+
+type UpdateSubjectType = {
+    id: string;
+    subjectName: string;
+    subjectDesc: string;
+}
+
 export const subjectAPISlice = createApi({
     reducerPath: "subjectAPISlice",
-    baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/subject" }),
     endpoints: (builder) => ({
         getAllSubjects: builder.query({
-            query: () => "/subjects/all",
+            query: () => "/all",
         }),
         getSubjectById: builder.query({
-            query: (id: string) => `/subjects/${id}`,
+            query: (id: string) => ({
+                url: "/",
+                method: "GET",
+                params: { id },
+            }),
         }),
         createSubject: builder.mutation({
-            query: (formData) => ({
-                url: "/subjects",
+            query: (formData: CreateSubjectType) => ({
+                url: "/",
                 method: "POST",
                 body: formData,
             }),
@@ -32,20 +49,21 @@ export const subjectAPISlice = createApi({
             },
         }),
         updateSubject: builder.mutation({
-            query: ({ id, formData }) => ({
-                url: `/subjects/${id}`,
+            query: (formData: UpdateSubjectType) => ({
+                url: `/`,
                 method: "PUT",
                 body: formData,
             }),
-            onQueryStarted: async ({ id, formData }, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     subjectAPISlice.util.updateQueryData("getAllSubjects", undefined, (draft) => {
-                        const index = draft.findIndex((subject: Subject) => subject.id === id);
+                        const index = draft.findIndex((subject: Subject) => subject.id === arg.id);
                         if (index !== -1) {
-                            draft[index] = { ...draft[index], ...formData };
+                            draft[index] = { ...draft[index], ...arg };
                         }
                     })
                 );
+
                 try {
                     await queryFulfilled;
                 }
@@ -55,9 +73,10 @@ export const subjectAPISlice = createApi({
             },
         }),
         deleteSubject: builder.mutation({
-            query: (id) => ({
-                url: `/subjects/${id}`,
+            query: (id: string) => ({
+                url: `/`,
                 method: "DELETE",
+                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
