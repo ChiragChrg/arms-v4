@@ -17,7 +17,7 @@ import { Loader2Icon, PlusIcon, User2Icon } from 'lucide-react'
 
 const CreateInstitute = () => {
     const [instituteName, setInstituteName] = useState<string>("")
-    const [instituteDesc, setInstituteDesc] = useState<string>("")
+    const [description, setDescription] = useState<string>("")
     const [isInvalid, setIsInvalid] = useState<boolean>(false)
     const router = useRouter()
 
@@ -34,7 +34,7 @@ const CreateInstitute = () => {
         try {
             const res = await createInstitution({
                 instituteName,
-                instituteDesc,
+                description,
                 creatorId: user.id
             }).unwrap();
 
@@ -103,10 +103,10 @@ const CreateInstitute = () => {
                                 maxLength={80}
                                 required={true}
                                 placeholder='Enter Institute Description'
-                                onChange={(e) => setInstituteDesc(e?.target?.value)}
+                                onChange={(e) => setDescription(e?.target?.value)}
                                 className='resize-none text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
-                            <p className='w-full text-right text-[0.8em] text-slate-400 px-1'>{instituteDesc.length}/80</p>
+                            <p className='w-full text-right text-[0.8em] text-slate-400 px-1'>{description.length}/80</p>
                         </div>
                     </label>
 

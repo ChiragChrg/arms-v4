@@ -6,6 +6,7 @@ export async function GET() {
         const institutions = await prisma.institute.findMany({
             include: {
                 courses: true,
+                creator: true,
             },
         });
 

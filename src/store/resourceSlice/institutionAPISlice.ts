@@ -1,26 +1,32 @@
-import { Institute } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { InstitutionTypes } from "../types";
 
 type CreateInstitutionType = {
     instituteName: string,
-    instituteDesc: string,
-    creatorId: string
+    description: string,
+    creatorId: string,
+
+    // Optional properties for the API request to match the InstitutionTypes interface
+    id?: never;
+    createdAt?: never;
+    courses?: never[];
+    creator?: never;
 }
 
 type UpdateInstitutionType = {
     id: string;
     instituteName: string;
-    instituteDesc: string;
+    description: string;
 }
 
 export const institutionAPISlice = createApi({
     reducerPath: "institutionAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/institution" }),
     endpoints: (builder) => ({
-        getAllInstitutions: builder.query({
+        getAllInstitutions: builder.query<InstitutionTypes[], unknown>({
             query: () => "/all",
         }),
-        getInstitutionById: builder.query({
+        getInstitutionById: builder.query<InstitutionTypes, unknown>({
             query: (id: string) => ({
                 url: "/",
                 method: "GET",
@@ -36,7 +42,13 @@ export const institutionAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     institutionAPISlice.util.updateQueryData("getAllInstitutions", undefined, (draft) => {
-                        draft.push(arg);
+                        draft.push({
+                            ...arg,
+                            id: "temp-id-" + Date.now(),
+                            createdAt: new Date(),
+                            courses: [],
+                            creator: undefined,
+                        });
                     })
                 );
                 try {
@@ -55,7 +67,7 @@ export const institutionAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     institutionAPISlice.util.updateQueryData("getAllInstitutions", undefined, (draft) => {
-                        const index = draft.findIndex((institution: Institute) => institution.id === arg.id);
+                        const index = draft.findIndex((institution: InstitutionTypes) => institution.id === arg.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...arg };
                         }
@@ -77,7 +89,7 @@ export const institutionAPISlice = createApi({
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     institutionAPISlice.util.updateQueryData("getAllInstitutions", undefined, (draft) => {
-                        const index = draft.findIndex((institution: Institute) => institution.id === id);
+                        const index = draft.findIndex((institution: InstitutionTypes) => institution.id === id);
                         if (index !== -1) {
                             draft.splice(index, 1);
                         }
