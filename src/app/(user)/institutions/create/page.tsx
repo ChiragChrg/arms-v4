@@ -31,17 +31,22 @@ const CreateInstitute = () => {
         e?.preventDefault();
         if (isInvalid) return;
 
-        const res = await createInstitution({
-            instituteName,
-            instituteDesc,
-            creatorId: user.id
-        }).unwrap();
+        try {
+            const res = await createInstitution({
+                instituteName,
+                instituteDesc,
+                creatorId: user.id
+            }).unwrap();
 
-        if (res.status === 200) {
-            toast.success("Institute Created Successfully!")
-            router.push("/institutions")
-        } else {
-            toast.error(res.message)
+            if (res.status === 201) {
+                toast.success("Institute Created Successfully!");
+                router.push("/institutions");
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error) {
+            toast.error("Error while creating the institute.");
+            console.error(error);
         }
     }
 

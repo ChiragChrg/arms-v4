@@ -43,21 +43,26 @@ const CreateCourse = () => {
         e?.preventDefault();
         if (isInvalid) return;
 
-        if (instituteName.toLowerCase() === courseName.toLowerCase())
-            throw new Error("Course name cannot be same as institute name!")
+        try {
+            if (instituteName.toLowerCase() === courseName.toLowerCase())
+                throw new Error("Course name cannot be same as institute name!");
 
-        const res = await createCourse({
-            courseName,
-            courseDesc,
-            instituteId,
-            creatorId: user.id
-        }).unwrap();
+            const res = await createCourse({
+                courseName,
+                courseDesc,
+                instituteId,
+                creatorId: user.id
+            }).unwrap();
 
-        if (res.status === 200) {
-            toast.success("Course Created Successfully!")
-            router.push(`/institutions/${params?.instituteID}`)
-        } else {
-            toast.error(res.message)
+            if (res.status === 201) {
+                toast.success("Course Created Successfully!");
+                router.push(`/institutions/${params?.instituteID}`);
+            } else {
+                toast.error(res.message);
+            }
+        } catch (error: unknown) {
+            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
+            toast.error(errorMessage);
         }
     }
 
