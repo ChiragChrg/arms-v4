@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Document } from "@prisma/client";
+import { DocumentTypes } from "../types";
 
 type UploadDocumentType = {
     documentName: string;
@@ -58,7 +58,7 @@ export const documentAPISlice = createApi({
             onQueryStarted: async (formData, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     documentAPISlice.util.updateQueryData("getAllDocuments", undefined, (draft) => {
-                        const index = draft.findIndex((document: Document) => document.id === formData.id);
+                        const index = draft.findIndex((document: DocumentTypes) => document.id === formData.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...formData };
                         }
@@ -79,7 +79,7 @@ export const documentAPISlice = createApi({
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     documentAPISlice.util.updateQueryData("getAllDocuments", undefined, (draft) => {
-                        return draft.filter((document: Document) => document.id !== id);
+                        return draft.filter((document: DocumentTypes) => document.id !== id);
                     })
                 );
                 try {
