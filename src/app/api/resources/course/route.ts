@@ -19,7 +19,7 @@ type UpdateCourseType = {
 }
 
 // Get Course by ID
-export async function GET({ params }: Params) {
+export async function GET(_request: NextRequest, { params }: Params) {
     const { id } = params;
 
     try {

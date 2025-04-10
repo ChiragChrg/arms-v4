@@ -19,7 +19,7 @@ type UpdateUnitType = {
 }
 
 // Get Unit by ID
-export async function GET({ params }: Params) {
+export async function GET(_request: NextRequest, { params }: Params) {
     const { id } = params;
 
     try {
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 // Delete Unit
-export async function DELETE({ params }: Params) {
+export async function DELETE(_request: NextRequest, { params }: Params) {
     const { id } = params;
 
     try {

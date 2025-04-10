@@ -13,7 +13,7 @@ type ApproveFacultyType = {
 };
 
 // GET Faculty By ID
-export async function GET({ params }: Params) {
+export async function GET(_request: NextRequest, { params }: Params) {
     const { userId } = params;
 
     try {
