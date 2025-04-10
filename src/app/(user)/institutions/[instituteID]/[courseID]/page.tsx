@@ -1,11 +1,8 @@
-"use client"
+"use client";
+
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getInstitution } from '@/app/actions/DocsActions'
-import useUserStore from '@/store/useUserStore'
-import { DataStoreTypes, courseType } from '@/types/dataStoreTypes'
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -17,6 +14,9 @@ import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
+import { SEL_User, useGetAllCoursesQuery } from '@/store';
+import { useSelector } from 'react-redux';
+import { CourseTypes } from '@/store/types';
 
 type Params = {
     instituteID: string,
@@ -25,59 +25,49 @@ type Params = {
 
 const CourseInfo = () => {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
-    const { user, isAdmin } = useUserStore()
     const pathname = usePathname()
     const params = useParams<Params>()
     const router = useRouter()
-    const queryClient = useQueryClient()
 
-    const { data: course, isError, isLoading } = useQuery({
-        queryKey: ['getInstitutebyName', params?.instituteID, params?.courseID],
-        queryFn: async () => {
-            try {
-                const instituteName = params?.instituteID?.replaceAll("-", " ");
-                const res = await getInstitution(instituteName) as DataStoreTypes;
-                const courseData = res?.course?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase()) || {} as courseType
-                return courseData;
-            } catch (error) {
-                console.error('Error fetching institutions:', error);
-                throw new Error('Failed to fetch institutions data');
-            }
-        },
-        initialData: () => {
-            const init = queryClient.getQueryData(['getInstitutebyName', params?.instituteID, params?.courseID]) as DataStoreTypes
-            const courseData = init?.course?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase()) as courseType
-            return courseData
-        },
-        initialDataUpdatedAt: () => queryClient.getQueryState(['getInstitutebyName', params?.instituteID, params?.courseID])?.dataUpdatedAt,
-    });
+    // Get user data
+    const { userData: user, isAdmin } = useSelector(SEL_User);
 
-    if (isError) {
-        toast.error("Error while fetching Course")
-        router.push(`/institutions/${params?.instituteID}`)
-    }
+    // Get all course data
+    const { data: courseList, isLoading } = useGetAllCoursesQuery({});
 
+    // Get Current course data
+    const course = useMemo(() => courseList?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase()) || {} as CourseTypes, [courseList, params?.courseID]);
+
+    // If course not found, redirect to 404 page
+    useEffect(() => {
+        if (!isLoading && !course) {
+            toast.error("Course not found")
+            router.push("/404")
+        }
+    }, [course, isLoading, router])
+
+    // Grant DELETE access if user is ADMIN or the CREATOR
+    useEffect(() => {
+        if (isAdmin || user.id === course.creatorId)
+            setIsAuthorized(true)
+        else
+            setIsAuthorized(false)
+    }, [user, isAdmin, course.creatorId]);
+
+    // Count documents
     const docsCount = useMemo(() => {
         let totalDocs = 0
 
         if (course) {
-            course?.subjects?.forEach((subjectObj) => {
-                subjectObj?.units?.forEach((unitObj) => {
-                    totalDocs += unitObj?.unitDocs?.length || 0
+            course?.subjects?.forEach((subject) => {
+                subject?.units?.forEach((unit) => {
+                    totalDocs += unit?.documents?.length || 0
                 })
             })
         }
 
-        return totalDocs
+        return totalDocs;
     }, [course])
-
-    // Grant DELETE access if user is ADMIN or the CREATOR
-    useEffect(() => {
-        if (isAdmin || user?.uid === course?.courseCreator?._id)
-            setIsAuthorized(true)
-        else
-            setIsAuthorized(false)
-    }, [user, isAdmin, course?.courseCreator?._id])
 
     return (
         <section className='section_style'>
@@ -91,10 +81,10 @@ const CourseInfo = () => {
 
                 <DropdownSettings
                     title='Course'
-                    toDeleteName={course?.courseName as string}
+                    toDeleteName={course?.courseName}
                     isAuthorized={isAuthorized}
-                    userID={user?.uid as string}
-                    documentData={course as courseType} />
+                    userID={user.id as string}
+                    documentData={course} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">
@@ -132,8 +122,8 @@ const CourseInfo = () => {
                         <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={course?.courseCreator?.avatarImg} size={25} />
-                                <span>{course?.courseCreator?.username}</span>
+                                <AvatarImage url={course.creator?.image} size={25} />
+                                <span>{course.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">

@@ -1,5 +1,5 @@
-import { Course } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { CourseTypes } from "../types";
 
 type CreateCourseType = {
     courseName: string,
@@ -18,10 +18,10 @@ export const courseAPISlice = createApi({
     reducerPath: "courseAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/course" }),
     endpoints: (builder) => ({
-        getAllCourses: builder.query({
+        getAllCourses: builder.query<CourseTypes[], unknown>({
             query: () => "/all",
         }),
-        getCourseById: builder.query({
+        getCourseById: builder.query<CourseTypes, unknown>({
             query: (id: string) => ({
                 url: "/",
                 method: "GET",
@@ -37,7 +37,7 @@ export const courseAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     courseAPISlice.util.updateQueryData("getAllCourses", undefined, (draft) => {
-                        draft.push(arg);
+                        draft.push(arg as CourseTypes);
                     })
                 );
                 try {
@@ -45,7 +45,7 @@ export const courseAPISlice = createApi({
                 } catch {
                     patchResult.undo();
                 }
-            }
+            },
         }),
         updateCourse: builder.mutation({
             query: (formData: UpdateCourseType) => ({
@@ -56,7 +56,7 @@ export const courseAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     courseAPISlice.util.updateQueryData("getAllCourses", undefined, (draft) => {
-                        const index = draft.findIndex((course: Course) => course.id === arg.id);
+                        const index = draft.findIndex((course: CourseTypes) => course.id === arg.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...arg };
                         }
@@ -78,7 +78,7 @@ export const courseAPISlice = createApi({
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     courseAPISlice.util.updateQueryData("getAllCourses", undefined, (draft) => {
-                        return draft.filter((course: Course) => course.id !== id);
+                        return draft.filter((course: CourseTypes) => course.id !== id);
                     })
                 );
                 try {
