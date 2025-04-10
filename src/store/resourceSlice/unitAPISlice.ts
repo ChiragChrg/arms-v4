@@ -1,5 +1,5 @@
-import { Unit } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { UnitTypes } from "../types";
 
 type CreateUnitType = {
     unitName: string,
@@ -18,10 +18,10 @@ export const unitAPISlice = createApi({
     reducerPath: "unitAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/unit" }),
     endpoints: (builder) => ({
-        getAllUnits: builder.query({
+        getAllUnits: builder.query<UnitTypes[], unknown>({
             query: () => "/all",
         }),
-        getUnitById: builder.query({
+        getUnitById: builder.query<UnitTypes, unknown>({
             query: (id: string) => ({
                 url: "/",
                 method: "GET",
@@ -37,7 +37,7 @@ export const unitAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     unitAPISlice.util.updateQueryData("getAllUnits", undefined, (draft) => {
-                        draft.push(arg);
+                        draft.push(arg as UnitTypes);
                     })
                 );
                 try {
@@ -56,7 +56,7 @@ export const unitAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     unitAPISlice.util.updateQueryData("getAllUnits", undefined, (draft) => {
-                        const index = draft.findIndex((unit: Unit) => unit.id === arg.id);
+                        const index = draft.findIndex((unit: UnitTypes) => unit.id === arg.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...arg };
                         }
@@ -78,7 +78,7 @@ export const unitAPISlice = createApi({
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     unitAPISlice.util.updateQueryData("getAllUnits", undefined, (draft) => {
-                        return draft.filter((unit: Unit) => unit.id !== id);
+                        return draft.filter((unit: UnitTypes) => unit.id !== id);
                     })
                 );
                 try {

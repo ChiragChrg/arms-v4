@@ -1,10 +1,8 @@
-"use client"
+"use client";
+
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useQueryClient } from '@tanstack/react-query'
-import { DataStoreTypes, courseType, subjectType, unitType } from '@/types/dataStoreTypes'
 import { useEdgeStore } from '@/lib/edgestore'
-import axios from 'axios'
 
 import { Button } from '../ui/button'
 import toast from 'react-hot-toast'
@@ -28,13 +26,15 @@ import {
     DialogFooter,
     DialogClose
 } from "@/components/ui/dialog"
+import { CourseTypes, InstitutionTypes, SubjectTypes, UnitTypes } from '@/store/types'
+import { useDeleteCourseMutation, useDeleteInstitutionMutation, useDeleteSubjectMutation, useDeleteUnitMutation } from '@/store'
 
 type Props = {
     title: string,
-    toDeleteName: string,
+    deleteName: string,
+    userId: string,
     isAuthorized: boolean,
-    userID: string,
-    documentData: DataStoreTypes | courseType | subjectType | unitType
+    documentData: InstitutionTypes | CourseTypes | SubjectTypes | UnitTypes
 }
 
 type Params = {
@@ -52,17 +52,24 @@ type RecentDataType = {
     }[]
 }
 
-const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentData }: Props) => {
+const DropdownSettings = ({ title, deleteName, userId, isAuthorized, documentData }: Props) => {
     const [open, setOpen] = useState<boolean>(false)
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
     const params = useParams<Params>()
     const router = useRouter()
     const { edgestore } = useEdgeStore();
-    const queryClient = useQueryClient()
 
+    // Delete Mutation Handler
+    const [deleteInstitution] = useDeleteInstitutionMutation();
+    const [deleteCourse] = useDeleteCourseMutation();
+    const [deleteSubject] = useDeleteSubjectMutation();
+    const [deleteUnit] = useDeleteUnitMutation();
+
+    // Compare input value with the text to delete
     const compareText = (value: string) => {
-        if (value === `Delete ${toDeleteName}`)
+        if (value === `Delete ${deleteName}`)
             setIsDisabled(false)
         else
             setIsDisabled(true)
@@ -71,57 +78,57 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
     // Delete LocalStorage Recents data
     const deleteRecentTopics = async () => {
         const recentDataUsers: RecentDataType = JSON.parse(localStorage.getItem("arms-recents") as string) || []
-        const recentData = recentDataUsers[userID]
+        const recentData = recentDataUsers[userId]
 
         const filteredData = recentData?.filter((obj) => {
             const topic = obj.url.split("/"); //split url to compare each text with toDeleteName
-            return !topic.includes(toDeleteName?.replaceAll(" ", "-").toLowerCase());
+            return !topic.includes(deleteName?.replaceAll(" ", "-").toLowerCase());
         }); // return only the topics which dont include the toDeleteName value
 
-        recentDataUsers[userID] = filteredData
+        recentDataUsers[userId] = filteredData
         localStorage.setItem("arms-recents", JSON.stringify(recentDataUsers))
     }
 
     // Delete all uploaded documents from EdgeStore
     const deleteAllDocuments = async (type: "institute" | "course" | "subject" | "unit") => {
         if (type === "institute") {
-            const Institute = documentData as DataStoreTypes
-            Institute?.course?.forEach((course) => {
+            const Institute = documentData as InstitutionTypes;
+            Institute?.courses?.forEach((course) => {
                 course?.subjects?.forEach((subject) => {
                     subject?.units?.forEach(async (unit) => {
-                        unit?.unitDocs?.forEach(async (doc) => {
+                        unit?.documents?.forEach(async (document) => {
                             await edgestore.publicFiles.delete({
-                                url: doc?.docLink,
+                                url: document.link,
                             });
                         })
                     })
                 })
             })
         } else if (type === "course") {
-            const Course = documentData as courseType
+            const Course = documentData as CourseTypes;
             Course?.subjects?.forEach((subject) => {
                 subject?.units?.forEach(async (unit) => {
-                    unit?.unitDocs?.forEach(async (doc) => {
+                    unit?.documents?.forEach(async (document) => {
                         await edgestore.publicFiles.delete({
-                            url: doc?.docLink,
+                            url: document.link,
                         });
                     })
                 })
             })
         } else if (type === "subject") {
-            const Subject = documentData as subjectType
+            const Subject = documentData as SubjectTypes;
             Subject?.units?.forEach(async (unit) => {
-                unit?.unitDocs?.forEach(async (doc) => {
+                unit?.documents?.forEach(async (document) => {
                     await edgestore.publicFiles.delete({
-                        url: doc?.docLink,
+                        url: document.link,
                     });
                 })
             })
         } else if (type === "unit") {
-            const Unit = documentData as unitType
-            Unit?.unitDocs?.forEach(async (doc) => {
+            const Unit = documentData as UnitTypes;
+            Unit?.documents?.forEach(async (document) => {
                 await edgestore.publicFiles.delete({
-                    url: doc?.docLink,
+                    url: document.link,
                 });
             })
         }
@@ -132,11 +139,7 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
         setIsDisabled(true)
         try {
             if (title === "Institute") {
-                const res = await axios.delete('/api/delete/institute', {
-                    data: {
-                        instituteName: params?.instituteID.replaceAll("-", " ").toLowerCase(),
-                    }
-                });
+                const res = await deleteInstitution(documentData.id).unwrap();
 
                 if (res?.status === 200) {
                     await deleteRecentTopics()
@@ -146,12 +149,7 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
                     router.push(`/institutions`)
                 }
             } else if (title === "Course") {
-                const res = await axios.delete('/api/delete/course', {
-                    data: {
-                        instituteName: params?.instituteID.replaceAll("-", " ").toLowerCase(),
-                        courseName: params?.courseID.replaceAll("-", " ").toLowerCase(),
-                    }
-                });
+                const res = await deleteCourse(documentData.id).unwrap();
 
                 if (res?.status === 200) {
                     await deleteRecentTopics()
@@ -161,13 +159,7 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
                     router.push(`/institutions/${params?.instituteID}`)
                 }
             } else if (title === "Subject") {
-                const res = await axios.delete('/api/delete/subject', {
-                    data: {
-                        instituteName: params?.instituteID.replaceAll("-", " ").toLowerCase(),
-                        courseName: params?.courseID.replaceAll("-", " ").toLowerCase(),
-                        subjectName: params?.subjectID.replaceAll("-", " ").toLowerCase(),
-                    }
-                });
+                const res = await deleteSubject(documentData.id).unwrap();
 
                 if (res?.status === 200) {
                     await deleteRecentTopics()
@@ -178,14 +170,7 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
                 }
             }
             else if (title === "Unit") {
-                const res = await axios.delete('/api/delete/unit', {
-                    data: {
-                        instituteName: params?.instituteID.replaceAll("-", " ").toLowerCase(),
-                        courseName: params?.courseID.replaceAll("-", " ").toLowerCase(),
-                        subjectName: params?.subjectID.replaceAll("-", " ").toLowerCase(),
-                        unitName: params?.unitID.replaceAll("-", " ").toLowerCase(),
-                    }
-                });
+                const res = await deleteUnit(documentData.id).unwrap();
 
                 if (res?.status === 200) {
                     await deleteRecentTopics()
@@ -199,7 +184,6 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
             console.log(err)
             toast.error(`Error while deleting ${title}`)
         } finally {
-            await queryClient.invalidateQueries()
             setIsLoading(false)
             setIsDisabled(false)
         }
@@ -232,7 +216,7 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
 
                 <DialogContent className='w-[90%] md:max-w-fit mx-auto rounded-md'>
                     <DialogHeader>
-                        <DialogTitle>Delete {title} <span className='text-red-600'>{toDeleteName}</span> ?</DialogTitle>
+                        <DialogTitle>Delete {title} <span className='text-red-600'>{deleteName}</span> ?</DialogTitle>
                         <DialogDescription>
                             Are you sure about that? <br />
                             This will permanently delete the {title} and all of its contents.
@@ -241,13 +225,13 @@ const DropdownSettings = ({ title, toDeleteName, isAuthorized, userID, documentD
 
                     <label className="relative sm:min-w-[350px]">
                         <span className='text-[0.9em] bg-background/0 px-1'>
-                            Type &quot; <span className='text-red-500'>Delete {toDeleteName}</span> &quot; to confirm.
+                            Type &quot; <span className='text-red-500'>Delete {deleteName}</span> &quot; to confirm.
                         </span>
 
                         <div className="flex items-center border border-muted-foreground sm:focus-within:border-primary rounded p-1 mt-3">
                             <input
                                 type="text"
-                                placeholder={`Delete ${toDeleteName}`}
+                                placeholder={`Delete ${deleteName}`}
                                 required={true}
                                 onChange={(e) => compareText(e.target.value)}
                                 className='text-[0.9em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />

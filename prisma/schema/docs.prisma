@@ -36,11 +36,10 @@ model Subject {
 }
 
 model Unit {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String     @id @default(auto()) @map("_id") @db.ObjectId
     unitName  String
     unitDesc  String
-    createdAt DateTime @default(now()) @db.Date
-
+    createdAt DateTime   @default(now()) @db.Date
     documents Document[]
     creator   User       @relation("UnitCreator", fields: [creatorId], references: [id])
     creatorId String     @db.ObjectId

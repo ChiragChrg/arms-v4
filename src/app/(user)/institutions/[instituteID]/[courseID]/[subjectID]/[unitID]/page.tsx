@@ -66,7 +66,7 @@ const UnitInfo = () => {
 
     // Get Current Unit Data
     const unit = useMemo(() => {
-        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) as UnitTypes;
+        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) || {} as UnitTypes;
     }, [params?.unitID, allUnits]);
 
     // Delete Document Mutation Handler
@@ -169,9 +169,9 @@ const UnitInfo = () => {
 
                 <DropdownSettings
                     title='Unit'
-                    toDeleteName={unit?.unitName as string}
+                    deleteName={unit?.unitName}
+                    userId={user.id}
                     isAuthorized={isAuthorized}
-                    userID={user.id}
                     documentData={unit} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
