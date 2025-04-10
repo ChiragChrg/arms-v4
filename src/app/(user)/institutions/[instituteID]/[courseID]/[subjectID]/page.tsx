@@ -2,10 +2,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getInstitution } from '@/app/actions/DocsActions'
-import useUserStore from '@/store/useUserStore'
-import { DataStoreTypes, courseType, subjectType } from '@/types/dataStoreTypes'
+import { useSelector } from 'react-redux'
+import { SEL_User, useGetAllSubjectsQuery } from '@/store'
+import { SubjectTypes } from '@/store/types'
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -25,58 +24,47 @@ type Params = {
 
 const SubjectInfo = () => {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
-    const { user, isAdmin } = useUserStore()
     const pathname = usePathname()
     const params = useParams<Params>()
     const router = useRouter()
-    const queryClient = useQueryClient()
 
-    const { data: subject, isError, isLoading } = useQuery({
-        queryKey: ['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID],
-        queryFn: async () => {
-            try {
-                const instituteName = params?.instituteID?.replaceAll("-", " ");
-                const res = await getInstitution(instituteName) as DataStoreTypes;
-                const courseData = res?.course?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase())
-                const subjectData = courseData?.subjects?.find(obj => obj?.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) || {} as subjectType
-                return subjectData
-            } catch (error) {
-                console.error('Error fetching institutions:', error);
-                throw new Error('Failed to fetch institutions data');
-            }
-        },
-        initialData: () => {
-            const courseData = queryClient.getQueryData(['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID]) as courseType
-            const subjectData = courseData?.subjects?.find(obj => obj?.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) as subjectType
-            return subjectData
-        },
-        initialDataUpdatedAt: () => queryClient.getQueryState(['getInstitutebyName', params?.instituteID, params?.courseID, params?.subjectID])?.dataUpdatedAt,
-    });
+    // Get User Data
+    const { userData: user, isAdmin } = useSelector(SEL_User);
 
-    if (isError) {
-        toast.error("Error while fetching Subject")
-        router.push(`/institutions/${params?.instituteID}/${params?.courseID}`)
-    }
+    // Get All Subject Data
+    const { data: subjectList, isLoading } = useGetAllSubjectsQuery({});
 
+    // Get Current Subject Data
+    const subject = useMemo(() => subjectList?.find((subject) => subject.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) || {} as SubjectTypes, [subjectList, params?.subjectID]);
+
+    // If subject not found, redirect to 404 page
+    useEffect(() => {
+        if (!isLoading && !subject) {
+            toast.error("Subject not found")
+            router.push("/404")
+        }
+    }, [subject, isLoading, router])
+
+    // Grant DELETE access if user is ADMIN or the CREATOR
+    useEffect(() => {
+        if (isAdmin || user.id === subject?.creatorId)
+            setIsAuthorized(true)
+        else
+            setIsAuthorized(false)
+    }, [user, isAdmin, subject?.creatorId])
+
+    // Count documents
     const docsCount = useMemo(() => {
         let totalDocs = 0
 
         if (subject) {
-            subject?.units?.forEach((unitObj) => {
-                totalDocs += unitObj?.unitDocs?.length || 0
+            subject?.units?.forEach((unit) => {
+                totalDocs += unit?.documents?.length || 0
             })
         }
 
         return totalDocs
     }, [subject])
-
-    // Grant DELETE access if user is ADMIN or the CREATOR
-    useEffect(() => {
-        if (isAdmin || user?.uid === subject?.subjectCreator?._id)
-            setIsAuthorized(true)
-        else
-            setIsAuthorized(false)
-    }, [user, isAdmin, subject?.subjectCreator?._id])
 
     return (
         <section className='section_style'>
@@ -95,10 +83,10 @@ const SubjectInfo = () => {
 
                 <DropdownSettings
                     title='Subject'
-                    toDeleteName={subject?.subjectName as string}
+                    toDeleteName={subject?.subjectName}
                     isAuthorized={isAuthorized}
-                    userID={user?.uid as string}
-                    documentData={subject as subjectType} />
+                    userID={user.id}
+                    documentData={subject} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">
@@ -136,8 +124,8 @@ const SubjectInfo = () => {
                         <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={subject?.subjectCreator?.avatarImg} size={25} />
-                                <span>{subject?.subjectCreator?.username}</span>
+                                <AvatarImage url={subject.creator?.image} size={25} />
+                                <span>{subject.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">

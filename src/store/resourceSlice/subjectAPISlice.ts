@@ -1,5 +1,5 @@
-import { Subject } from "@prisma/client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { SubjectTypes } from "../types";
 
 type CreateSubjectType = {
     subjectName: string,
@@ -18,10 +18,10 @@ export const subjectAPISlice = createApi({
     reducerPath: "subjectAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/subject" }),
     endpoints: (builder) => ({
-        getAllSubjects: builder.query({
+        getAllSubjects: builder.query<SubjectTypes[], unknown>({
             query: () => "/all",
         }),
-        getSubjectById: builder.query({
+        getSubjectById: builder.query<SubjectTypes, unknown>({
             query: (id: string) => ({
                 url: "/",
                 method: "GET",
@@ -37,7 +37,7 @@ export const subjectAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     subjectAPISlice.util.updateQueryData("getAllSubjects", undefined, (draft) => {
-                        draft.push(arg);
+                        draft.push(arg as SubjectTypes);
                     })
                 );
                 try {
@@ -57,7 +57,7 @@ export const subjectAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     subjectAPISlice.util.updateQueryData("getAllSubjects", undefined, (draft) => {
-                        const index = draft.findIndex((subject: Subject) => subject.id === arg.id);
+                        const index = draft.findIndex((subject: SubjectTypes) => subject.id === arg.id);
                         if (index !== -1) {
                             draft[index] = { ...draft[index], ...arg };
                         }
@@ -81,7 +81,7 @@ export const subjectAPISlice = createApi({
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     subjectAPISlice.util.updateQueryData("getAllSubjects", undefined, (draft) => {
-                        return draft.filter((subject: Subject) => subject.id !== id);
+                        return draft.filter((subject: SubjectTypes) => subject.id !== id);
                     })
                 );
                 try {
