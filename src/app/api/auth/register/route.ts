@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/prisma"
 import * as bcrypt from "bcryptjs"
 
-interface RequestBody {
+type RegisterUserType = {
     name: string,
     email: string,
     password: string,
 }
 
 export async function POST(request: NextRequest) {
-    const { name, email, password }: RequestBody = await request.json()
+    const { name, email, password }: RegisterUserType = await request.json()
 
     if (!name || !email || !password) {
         throw new Error("Missing Fields")

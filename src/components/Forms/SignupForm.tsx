@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -8,7 +9,7 @@ import toast from 'react-hot-toast'
 import Input from '../CustomUI/Input'
 import { Button } from '../ui/button'
 import { Loader2Icon, UserPlusIcon } from 'lucide-react'
-import { registerUser } from '@/app/actions/UserActions'
+import { useRegisterMutation } from '@/store';
 
 type FormType = {
     name: string,
@@ -30,6 +31,10 @@ const SignupForm = () => {
     const params = useSearchParams().get("callbackUrl")
     const callback = params ? params as string : ""
 
+    // Register User Mutation Handler
+    const [register] = useRegisterMutation();
+
+    // Handle Signup Form Submit
     const HandleSignup = async (e: FormEvent<HTMLFormElement>) => {
         e?.preventDefault()
 
@@ -45,11 +50,12 @@ const SignupForm = () => {
         setIsLoading(true)
 
         try {
-            const res = await registerUser({
+            const res = await register({
                 name,
                 email,
                 password
-            })
+            }).unwrap();
+
             if (res?.status === 201) {
                 toast.success(res?.message, {
                     id: SignupToastID
@@ -67,6 +73,7 @@ const SignupForm = () => {
         }
     }
 
+    // Handle OAuth Login
     const HandleOAuthLogin = async (provider: string) => {
         const OAuthTostID = toast.loading(`Connecting to ${provider.charAt(0).toUpperCase() + provider.slice(1)}...`)
         setIsLoading(true)
