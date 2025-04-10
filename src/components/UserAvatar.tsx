@@ -15,7 +15,7 @@ import { loaderActions } from '@/store/loaderSlice/loaderSlice'
 import { UserTypes } from '@/store/types'
 
 const UserAvatar = () => {
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
     const { data: session, status } = useSession()
     const router = useRouter()
     const dispatch = useDispatch()

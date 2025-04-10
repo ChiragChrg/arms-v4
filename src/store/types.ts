@@ -11,7 +11,7 @@ export interface UserTypes {
 }
 
 export type UserState = {
-    userData: UserTypes;
+    user: UserTypes;
     isAdmin: boolean;
     isLoading: boolean;
 }

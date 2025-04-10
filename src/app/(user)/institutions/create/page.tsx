@@ -22,7 +22,7 @@ const CreateInstitute = () => {
     const router = useRouter()
 
     // Get User Data
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
 
     // Create Institute Mutation Handler
     const [createInstitution, { isLoading }] = useCreateInstitutionMutation();

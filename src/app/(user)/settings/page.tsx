@@ -13,7 +13,7 @@ import { modalActions } from '@/store/modalSlice/modalSlice'
 
 const Settings = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const { user, isAdmin } = useSelector(SEL_User);
     const dispatch = useDispatch();
 
 

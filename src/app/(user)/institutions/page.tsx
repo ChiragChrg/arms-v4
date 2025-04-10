@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { SEL_User, useGetAllInstitutionsQuery } from '@/store';
 
 const Institutions = () => {
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
 
     // Fetch all institutions
     const { data: institutions, isLoading } = useGetAllInstitutionsQuery({});

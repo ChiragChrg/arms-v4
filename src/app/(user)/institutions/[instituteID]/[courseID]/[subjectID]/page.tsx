@@ -29,7 +29,7 @@ const SubjectInfo = () => {
     const router = useRouter()
 
     // Get User Data
-    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const { user, isAdmin } = useSelector(SEL_User);
 
     // Get All Subject Data
     const { data: subjectList, isLoading } = useGetAllSubjectsQuery({});

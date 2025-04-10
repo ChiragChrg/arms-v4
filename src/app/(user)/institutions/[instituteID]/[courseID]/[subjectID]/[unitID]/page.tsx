@@ -61,7 +61,7 @@ const UnitInfo = () => {
     const { edgestore } = useEdgeStore();
 
     // Get User Data
-    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const { user, isAdmin } = useSelector(SEL_User);
     const { data: allUnits } = useGetAllUnitsQuery({});
 
     // Get Current Unit Data

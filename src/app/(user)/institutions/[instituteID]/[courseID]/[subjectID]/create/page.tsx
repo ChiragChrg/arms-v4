@@ -29,7 +29,7 @@ const CreateUnit = () => {
     const router = useRouter()
 
     // Get User Data
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
     const { data: subject } = useGetAllSubjectsQuery({});
 
     // Get Subject Data

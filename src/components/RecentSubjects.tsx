@@ -17,7 +17,7 @@ type RecentDataType = {
 
 const RecentSubjects = () => {
     const [recentTopic, setRecentTopic] = useState<RecentDataType[]>([])
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
 
     useEffect(() => {
         const userID = user.id as string

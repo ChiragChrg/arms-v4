@@ -30,7 +30,7 @@ const CourseInfo = () => {
     const router = useRouter()
 
     // Get user data
-    const { userData: user, isAdmin } = useSelector(SEL_User);
+    const { user, isAdmin } = useSelector(SEL_User);
 
     // Get all course data
     const { data: courseList, isLoading } = useGetAllCoursesQuery({});

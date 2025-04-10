@@ -29,7 +29,7 @@ const CreateSubject = () => {
     const router = useRouter()
 
     // Get User Data
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
     const { data: course } = useGetAllCoursesQuery({});
 
     // Create Subject Mutation Handler

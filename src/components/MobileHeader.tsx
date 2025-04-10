@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { SEL_User, sidebarActions } from "@/store"
 
 const MobileHeader = () => {
-    const { userData: user } = useSelector(SEL_User);
+    const { user } = useSelector(SEL_User);
     const { status } = useSession()
     const router = useRouter()
     const pathname = usePathname()
