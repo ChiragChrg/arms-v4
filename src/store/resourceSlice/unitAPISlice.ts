@@ -22,11 +22,7 @@ export const unitAPISlice = createApi({
             query: () => "/all",
         }),
         getUnitById: builder.query<UnitTypes, unknown>({
-            query: (id: string) => ({
-                url: "/",
-                method: "GET",
-                params: { id },
-            }),
+            query: (id: string) => `/${id}`,
         }),
         createUnit: builder.mutation({
             query: (formData: CreateUnitType) => ({
@@ -71,9 +67,8 @@ export const unitAPISlice = createApi({
         }),
         deleteUnit: builder.mutation({
             query: (id: string) => ({
-                url: `/`,
+                url: `/${id}`,
                 method: "DELETE",
-                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(

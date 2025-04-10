@@ -22,11 +22,7 @@ export const courseAPISlice = createApi({
             query: () => "/all",
         }),
         getCourseById: builder.query<CourseTypes, unknown>({
-            query: (id: string) => ({
-                url: "/",
-                method: "GET",
-                params: { id },
-            }),
+            query: (id: string) => `/get/${id}`,
         }),
         createCourse: builder.mutation({
             query: (formData: CreateCourseType) => ({
@@ -71,9 +67,8 @@ export const courseAPISlice = createApi({
         }),
         deleteCourse: builder.mutation({
             query: (id: string) => ({
-                url: `/`,
+                url: `/${id}`,
                 method: "DELETE",
-                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(

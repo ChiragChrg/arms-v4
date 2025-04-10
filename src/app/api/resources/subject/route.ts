@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/prisma';
 
-type Params = {
-    params: { id: string };
-};
-
 type CreateSubjectType = {
     subjectName: string,
     subjectDesc: string,
@@ -16,26 +12,6 @@ type UpdateSubjectType = {
     id: string;
     subjectName: string;
     subjectDesc: string;
-}
-
-// Get Subject by ID
-export async function GET(_request: NextRequest, { params }: Params) {
-    const { id } = params;
-
-    try {
-        const subject = await prisma.subject.findUnique({
-            where: { id }
-        });
-
-        if (!subject) {
-            return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
-        }
-
-        return NextResponse.json(subject, { status: 200 });
-    } catch (err) {
-        console.error('Error fetching subject:', err);
-        return NextResponse.json({ error: 'Uncaught Subject Error' }, { status: 500 });
-    }
 }
 
 // Create Subject
@@ -92,26 +68,6 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json(updatedSubject, { status: 200 });
     } catch (err) {
         console.error('Error updating subject:', err);
-        return NextResponse.json({ error: 'Uncaught Subject Error' }, { status: 500 });
-    }
-}
-
-// Delete Subject
-export async function DELETE(_request: NextRequest, { params }: Params) {
-    const { id } = params;
-
-    try {
-        if (!id) {
-            return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
-        }
-
-        const deletedSubject = await prisma.subject.delete({
-            where: { id },
-        });
-
-        return NextResponse.json(deletedSubject, { status: 200 });
-    } catch (err) {
-        console.error('Error deleting subject:', err);
         return NextResponse.json({ error: 'Uncaught Subject Error' }, { status: 500 });
     }
 }

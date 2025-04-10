@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/prisma";
 
-type Params = {
-    params: { id: string };
-};
-
 type UploadDocumentType = {
     documentName: string;
     documentDesc: string;
@@ -24,26 +20,6 @@ type UpdateDocumentType = {
     documentName: string;
     documentDesc: string;
 };
-
-// Get Document by ID
-export async function GET(_request: NextRequest, { params }: Params) {
-    const { id } = params;
-
-    try {
-        const document = await prisma.document.findUnique({
-            where: { id },
-        });
-
-        if (!document) {
-            return NextResponse.json({ error: "Document not found" }, { status: 404 });
-        }
-
-        return NextResponse.json(document, { status: 200 });
-    } catch (err) {
-        console.error("Error fetching document:", err);
-        return NextResponse.json({ error: "Uncaught Document Error" }, { status: 500 });
-    }
-}
 
 // Create Document
 export async function POST(request: NextRequest) {
@@ -98,22 +74,6 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json(updatedDocument, { status: 200 });
     } catch (err) {
         console.error("Error updating document:", err);
-        return NextResponse.json({ error: "Uncaught Document Error" }, { status: 500 });
-    }
-}
-
-// Delete Document
-export async function DELETE(_request: NextRequest, { params }: Params) {
-    const { id } = params;
-
-    try {
-        const deletedDocument = await prisma.document.delete({
-            where: { id },
-        });
-
-        return NextResponse.json(deletedDocument, { status: 200 });
-    } catch (err) {
-        console.error("Error deleting document:", err);
         return NextResponse.json({ error: "Uncaught Document Error" }, { status: 500 });
     }
 }

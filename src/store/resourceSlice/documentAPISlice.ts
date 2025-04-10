@@ -28,11 +28,7 @@ export const documentAPISlice = createApi({
             query: () => "/all",
         }),
         getDocumentById: builder.query({
-            query: (id: string) => ({
-                url: "/",
-                method: "GET",
-                params: { id },
-            }),
+            query: (id: string) => `/get/${id}`,
         }),
         createDocument: builder.mutation({
             query: (formData: CreateDocumentType) => ({
@@ -77,9 +73,8 @@ export const documentAPISlice = createApi({
         }),
         deleteDocument: builder.mutation({
             query: (id: string) => ({
-                url: `/`,
+                url: `/${id}`,
                 method: "DELETE",
-                params: { id },
             }),
             onQueryStarted: async (id, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(

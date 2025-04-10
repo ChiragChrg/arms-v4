@@ -14,11 +14,7 @@ export const facultyAPISlice = createApi({
             query: () => '/all',
         }),
         getFacultyById: builder.query<UserTypes, string>({
-            query: (id: string) => ({
-                url: "/",
-                method: "GET",
-                params: { id },
-            }),
+            query: (id: string) => `/${id}`,
         }),
         approveFaculty: builder.mutation({
             query: (formData: ApproveFacultyType) => ({
@@ -45,9 +41,8 @@ export const facultyAPISlice = createApi({
         }),
         deleteFaculty: builder.mutation({
             query: (facultyId) => ({
-                url: `/delete`,
+                url: `/${facultyId}`,
                 method: 'DELETE',
-                body: { facultyId },
             }),
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
