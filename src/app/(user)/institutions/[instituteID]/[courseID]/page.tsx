@@ -129,7 +129,7 @@ const CourseInfo = () => {
                     </div>
 
                     <div className="w-full flex justify-end items-center gap-2 text-[0.8em]">
-                        <span>RegisteredBy : </span>
+                        <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
                                 <AvatarImage url={course?.courseCreator?.avatarImg} size={25} />
