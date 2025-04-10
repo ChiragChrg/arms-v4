@@ -7,7 +7,7 @@ const initialState = {
         id: "",
         name: "",
         email: "",
-        image: null,
+        image: "",
         emailVerified: false,
         isApproved: false,
         createdAt: null,

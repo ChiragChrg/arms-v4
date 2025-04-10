@@ -16,6 +16,7 @@ import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
 import { useSelector } from 'react-redux';
 import { SEL_User, useGetAllInstitutionsQuery } from '@/store';
+import { InstitutionTypes } from '@/store/types';
 
 type Params = {
     instituteID: string,
@@ -34,7 +35,7 @@ const InstituteInfo = () => {
     const { data: institutionList, isLoading } = useGetAllInstitutionsQuery({});
 
     // Get Current Institute Data
-    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID), [institutionList, params?.instituteID]);
+    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID) || {} as InstitutionTypes, [institutionList, params?.instituteID]);
 
     // Redirect to 404 if institute not found
     useEffect(() => {
@@ -88,9 +89,9 @@ const InstituteInfo = () => {
 
                 <DropdownSettings
                     title='Institute'
-                    toDeleteName={institute?.instituteName || ''}
+                    deleteName={institute?.instituteName || ''}
                     isAuthorized={isAuthorized}
-                    userID={user.id}
+                    userId={user.id}
                     documentData={institute} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">

@@ -81,9 +81,9 @@ const CourseInfo = () => {
 
                 <DropdownSettings
                     title='Course'
-                    toDeleteName={course?.courseName}
+                    deleteName={course?.courseName}
                     isAuthorized={isAuthorized}
-                    userID={user.id as string}
+                    userId={user.id}
                     documentData={course} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">

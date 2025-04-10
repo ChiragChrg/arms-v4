@@ -23,7 +23,7 @@ const ForgotPassword = () => {
         e.preventDefault()
 
         try {
-            const res = await forgotPassword({ email }).unwrap();
+            const res = await forgotPassword(email).unwrap();
 
             if (res.status === 200) {
                 // Mail Template Parameters

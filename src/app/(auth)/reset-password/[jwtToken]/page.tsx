@@ -34,8 +34,8 @@ const ResetPassword = () => {
     const [resetPassword, { isLoading }] = useResetPasswordMutation()
 
     // Decode JWT Token to get User ID and Name
-    const decodedToken = jose.decodeJwt(jwtToken) as Partial<DecodedToken>;
-    const { id, name, exp } = decodedToken;
+    const decodedToken = jose.decodeJwt(jwtToken);
+    const { id, name, exp } = decodedToken as DecodedToken;
 
     // Check if the token is valid
     if (!id || !name || !exp) {

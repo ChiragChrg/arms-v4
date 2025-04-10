@@ -7,7 +7,7 @@ type RegisterUserType = {
 }
 
 type ResetPasswordType = {
-    token: string,
+    id: string,
     password: string
 }
 
@@ -30,10 +30,10 @@ export const authAPISlice = createApi({
             }),
         }),
         resetPassword: builder.mutation({
-            query: ({ token, password }: ResetPasswordType) => ({
-                url: `/reset-password/${token}`,
+            query: ({ id, password }: ResetPasswordType) => ({
+                url: `/reset-password`,
                 method: 'POST',
-                body: { password },
+                body: { id, password },
             }),
         }),
     }),
