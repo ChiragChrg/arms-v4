@@ -1,11 +1,8 @@
-"use client"
+"use client";
+
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { getInstitution } from '@/app/actions/DocsActions'
-import useUserStore from '@/store/useUserStore'
-import { DataStoreTypes } from '@/types/dataStoreTypes'
+import Link from 'next/link'
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -17,6 +14,8 @@ import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
+import { useSelector } from 'react-redux';
+import { SEL_User, useGetAllInstitutionsQuery } from '@/store';
 
 type Params = {
     instituteID: string,
@@ -24,29 +23,27 @@ type Params = {
 
 const InstituteInfo = () => {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
-    const { user, isAdmin } = useUserStore()
     const pathname = usePathname()
     const params = useParams<Params>()
     const router = useRouter()
 
-    const { data: institute, isError, isLoading } = useQuery({
-        queryKey: ['getInstitutebyName', params?.instituteID],
-        queryFn: async () => {
-            try {
-                const instituteName = params?.instituteID?.replaceAll("-", " ");
-                const res = await getInstitution(instituteName) as DataStoreTypes;
-                return res;
-            } catch (error) {
-                console.error('Error fetching institutions:', error);
-                throw new Error('Failed to fetch institutions data');
-            }
-        },
-    });
+    // Get User Data
+    const { userData: user, isAdmin } = useSelector(SEL_User);
 
-    if (isError) {
-        toast.error("Error while fetching Institute")
-        router.push('/institutions')
-    }
+    // Get All Institutions Data
+    const { data: institutionList, isLoading } = useGetAllInstitutionsQuery({});
+
+    // Get Current Institute Data
+    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID), [institutionList, params?.instituteID]);
+
+    // Redirect to 404 if institute not found
+    useEffect(() => {
+        if (!isLoading && !institute) {
+            toast.error("Institute not found!")
+            router.push("/404")
+            return;
+        }
+    }, [isLoading, institute, router])
 
     // Course,Subjects, Docs Count
     const contentCount = useMemo(() => {
@@ -54,12 +51,12 @@ const InstituteInfo = () => {
         let totalDocs = 0;
 
         if (institute) {
-            institute?.course?.forEach((courseObj) => {
-                totalSubject += courseObj?.subjects?.length || 0;
+            institute?.courses?.forEach((course) => {
+                totalSubject += course?.subjects?.length || 0;
 
-                courseObj?.subjects?.forEach((subjectObj) => {
-                    subjectObj?.units?.forEach((unitObj) => {
-                        totalDocs += unitObj?.unitDocs?.length || 0
+                course?.subjects?.forEach((subject) => {
+                    subject?.units?.forEach((unit) => {
+                        totalDocs += unit?.documents?.length || 0
                     })
                 })
             });
@@ -73,11 +70,11 @@ const InstituteInfo = () => {
 
     // Grant DELETE access if user is ADMIN or the CREATOR
     useEffect(() => {
-        if (isAdmin || user?.uid === institute?.registeredBy?._id)
+        if (isAdmin || user.id === institute?.creatorId)
             setIsAuthorized(true)
         else
             setIsAuthorized(false)
-    }, [user, isAdmin, institute?.registeredBy?._id])
+    }, [user, isAdmin, institute?.creatorId])
 
     return (
         <section className='section_style'>
@@ -91,10 +88,10 @@ const InstituteInfo = () => {
 
                 <DropdownSettings
                     title='Institute'
-                    toDeleteName={institute?.instituteName as string}
+                    toDeleteName={institute?.instituteName || ''}
                     isAuthorized={isAuthorized}
-                    userID={user?.uid as string}
-                    documentData={institute as DataStoreTypes} />
+                    userID={user.id}
+                    documentData={institute} />
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">
@@ -116,7 +113,7 @@ const InstituteInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Courses: {institute?.course?.length || 0}</span>
+                                <span>Courses: {institute?.courses?.length || 0}</span>
                                 <span>Subjects: {contentCount.subjectCount}</span>
                                 <span>Documents: {contentCount.docsCount}</span>
                             </>
@@ -130,12 +127,12 @@ const InstituteInfo = () => {
                     </div>
 
                     <div className="w-full flex justify-end items-center gap-2 text-[0.8em]">
-                        <span>RegisteredBy : </span>
+                        <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={institute?.registeredBy?.avatarImg} size={25} />
+                                <AvatarImage url={institute?.creator?.image} size={25} />
 
-                                <span>{institute?.registeredBy?.username}</span>
+                                <span>{institute?.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">
@@ -160,16 +157,16 @@ const InstituteInfo = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.25em] mb-6">
                 {!isLoading ?
-                    institute?.course?.map((obj, index) => (
+                    institute?.courses?.map((course, index) => (
                         <Link
-                            href={`${pathname}/${obj?.courseName?.toLowerCase().replaceAll(" ", "-")}`}
+                            href={`${pathname}/${course?.courseName?.toLowerCase().replaceAll(" ", "-")}`}
                             key={index}
                             className="flex_center flex-col w-full h-full rounded-md bg-radialGradient dark:bg-radialGradientDark px-2 py-4">
                             <div className="w-fit bg-primary/80 p-4 rounded-full mb-4 text-white">
                                 <BookStackSVG size='40' />
                             </div>
-                            <span className="text-[1.4em] font-medium">{obj?.courseName}</span>
-                            <p className="w-full max-h-[45px] text-center text-[0.925em] opacity-80">{obj?.courseDesc}</p>
+                            <span className="text-[1.4em] font-medium">{course?.courseName}</span>
+                            <p className="w-full max-h-[45px] text-center text-[0.925em] opacity-80">{course?.courseDesc}</p>
                         </Link>
                     ))
                     :
