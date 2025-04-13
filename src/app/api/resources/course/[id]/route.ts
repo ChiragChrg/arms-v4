@@ -11,17 +11,37 @@ export async function GET(
     try {
         const course = await prisma.course.findUnique({
             where: { id },
-            include: {
-                subjects: true,
+            select: {
+                id: true,
+                courseName: true,
+                courseDesc: true,
+                createdAt: true,
                 creator: true,
-            },
+                subjects: true
+            }
         });
 
         if (!course) {
             return NextResponse.json({ error: 'Course not found' }, { status: 404 });
         }
 
-        return NextResponse.json(course, { status: 200 });
+        // Fetch related content flatly
+        const [subjects, units, documents] = await Promise.all([
+            prisma.subject.findMany({ where: { courseId: id }, select: { id: true } }),
+            prisma.unit.findMany({ select: { id: true, subjectId: true } }),
+            prisma.document.findMany({ select: { id: true, unitId: true } }),
+        ]);
+
+        const subjectIds = subjects.map(s => s.id);
+        const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
+
+        const counts = {
+            subjects: subjectIds.length,
+            units: unitIds.length,
+            documents: documents.filter(d => unitIds.includes(d.unitId)).length,
+        };
+
+        return NextResponse.json({ ...course, counts }, { status: 200 });
     } catch (err) {
         console.error('Error fetching course:', err);
         return NextResponse.json({ error: 'Uncaught Course Error' }, { status: 500 });

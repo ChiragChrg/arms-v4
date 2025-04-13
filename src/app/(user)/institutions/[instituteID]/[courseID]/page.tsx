@@ -54,19 +54,6 @@ const CourseInfo = () => {
             setIsAuthorized(false)
     }, [user, isAdmin, course.creatorId]);
 
-    // Count the number of subjects, units, and documents
-    const contentCount = useMemo(() => {
-        const allSubjects = course?.subjects || [];
-        const allUnits = allSubjects.flatMap(subject => subject?.units || []);
-        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
-
-        return {
-            subjects: allSubjects.length,
-            units: allUnits.length,
-            documents: allDocuments.length,
-        }
-    }, [course]);
-
     return (
         <section className='section_style'>
             <NavRoute routes={["Institutions", `Institutions/${params?.instituteID}`, `.${pathname}`]} />
@@ -104,9 +91,9 @@ const CourseInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Subjects: {contentCount.subjects}</span>
-                                <span>Units: {contentCount.units}</span>
-                                <span>Documents: {contentCount.documents}</span>
+                                <span>Subjects: {course.counts.subjects}</span>
+                                <span>Units: {course.counts.units}</span>
+                                <span>Documents: {course.counts.documents}</span>
                             </>
                             :
                             <>

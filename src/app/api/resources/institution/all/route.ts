@@ -24,10 +24,10 @@ export async function GET() {
         ]);
 
         // Build lookup maps for fast aggregation
+        const coursesByInstitute = _.groupBy(courses, 'instituteId');
         const subjectsByCourse = _.groupBy(subjects, 'courseId');
         const unitsBySubject = _.groupBy(units, 'subjectId');
         const documentsByUnit = _.groupBy(documents, 'unitId');
-        const coursesByInstitute = _.groupBy(courses, 'instituteId');
 
         const result = institutes.map(institute => {
             const instCourses = coursesByInstitute[institute.id] || [];

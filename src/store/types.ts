@@ -59,6 +59,11 @@ export interface CourseTypes {
     creatorId: string;
     creator?: UserTypes;
     createdAt: Date | null;
+    counts: {
+        subjects: number;
+        units: number;
+        documents: number;
+    };
 }
 
 export interface InstitutionTypes {
