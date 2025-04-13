@@ -11,19 +11,43 @@ export async function GET(
     try {
         const institution = await prisma.institute.findUnique({
             where: { id },
-            include: {
-                courses: true,
+            select: {
+                id: true,
+                instituteName: true,
+                description: true,
+                createdAt: true,
                 creator: true,
-            },
+                courses: true
+            }
         });
 
         if (!institution) {
             return NextResponse.json({ error: "Institution not found" }, { status: 404 });
         }
 
-        return NextResponse.json(institution, { status: 200 });
+        // Fetch related content flatly
+        const [courses, subjects, units, documents] = await Promise.all([
+            prisma.course.findMany({ where: { instituteId: id }, select: { id: true } }),
+            prisma.subject.findMany({ select: { id: true, courseId: true } }),
+            prisma.unit.findMany({ select: { id: true, subjectId: true } }),
+            prisma.document.findMany({ select: { id: true, unitId: true } }),
+        ]);
+
+        const courseIds = courses.map(c => c.id);
+        const subjectIds = subjects.filter(s => courseIds.includes(s.courseId)).map(s => s.id);
+        const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
+
+        const counts = {
+            courses: courseIds.length,
+            subjects: subjectIds.length,
+            units: unitIds.length,
+            documents: documents.filter(d => unitIds.includes(d.unitId)).length,
+        };
+
+        return NextResponse.json({ ...institution, counts }, { status: 200 });
+
     } catch (err) {
-        console.error("Error fetching institution:", err);
+        console.error("Error fetching institution by ID:", err);
         return NextResponse.json({ error: "Uncaught Institution Error" }, { status: 500 });
     }
 }

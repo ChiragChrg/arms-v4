@@ -69,6 +69,12 @@ export interface InstitutionTypes {
     creatorId: string;
     creator?: UserTypes;
     createdAt: Date | null;
+    counts: {
+        courses: number;
+        subjects: number;
+        units: number;
+        documents: number;
+    };
 }
 // #endregion Resource types
 

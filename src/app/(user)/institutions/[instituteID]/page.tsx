@@ -35,7 +35,7 @@ const InstituteInfo = () => {
     const { data: institutionList, isLoading } = useGetAllInstitutionsQuery({});
 
     // Get Current Institute Data
-    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID) || {} as InstitutionTypes, [institutionList, params?.instituteID]);
+    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID) as InstitutionTypes, [institutionList, params?.instituteID]);
 
     // Redirect to 404 if institute not found
     useEffect(() => {
@@ -45,21 +45,6 @@ const InstituteInfo = () => {
             return;
         }
     }, [isLoading, institute, router])
-
-    // Count the number of courses, subjects, units, and documents
-    const contentCount = useMemo(() => {
-        const courses = institute?.courses || [];
-        const allSubjects = courses.flatMap(course => course?.subjects || []);
-        const allUnits = allSubjects.flatMap(subject => subject?.units || []);
-        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
-
-        return {
-            courses: courses.length,
-            subjects: allSubjects.length,
-            units: allUnits.length,
-            documents: allDocuments.length,
-        };
-    }, [institute]);
 
     // Grant DELETE access if user is ADMIN or the CREATOR
     useEffect(() => {
@@ -106,10 +91,10 @@ const InstituteInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Courses: {contentCount.courses}</span>
-                                <span>Subjects: {contentCount.subjects}</span>
-                                <span>Units: {contentCount.units}</span>
-                                <span>Documents: {contentCount.documents}</span>
+                                <span>Courses: {institute.counts.courses}</span>
+                                <span>Subjects: {institute.counts.subjects}</span>
+                                <span>Units: {institute.counts.units}</span>
+                                <span>Documents: {institute.counts.documents}</span>
                             </>
                             :
                             <>
