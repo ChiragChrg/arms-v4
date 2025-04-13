@@ -46,26 +46,18 @@ const InstituteInfo = () => {
         }
     }, [isLoading, institute, router])
 
-    // Course,Subjects, Docs Count
+    // Count the number of courses, subjects, units, and documents
     const contentCount = useMemo(() => {
-        let totalSubject = 0;
-        let totalDocs = 0;
-
-        if (institute) {
-            institute?.courses?.forEach((course) => {
-                totalSubject += course?.subjects?.length || 0;
-
-                course?.subjects?.forEach((subject) => {
-                    subject?.units?.forEach((unit) => {
-                        totalDocs += unit?.documents?.length || 0
-                    })
-                })
-            });
-        }
+        const courses = institute?.courses || [];
+        const allSubjects = courses.flatMap(course => course?.subjects || []);
+        const allUnits = allSubjects.flatMap(subject => subject?.units || []);
+        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
 
         return {
-            subjectCount: totalSubject,
-            docsCount: totalDocs,
+            courses: courses.length,
+            subjects: allSubjects.length,
+            units: allUnits.length,
+            documents: allDocuments.length,
         };
     }, [institute]);
 
@@ -114,12 +106,14 @@ const InstituteInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Courses: {institute?.courses?.length || 0}</span>
-                                <span>Subjects: {contentCount.subjectCount}</span>
-                                <span>Documents: {contentCount.docsCount}</span>
+                                <span>Courses: {contentCount.courses}</span>
+                                <span>Subjects: {contentCount.subjects}</span>
+                                <span>Units: {contentCount.units}</span>
+                                <span>Documents: {contentCount.documents}</span>
                             </>
                             :
                             <>
+                                <RectLoader />
                                 <RectLoader />
                                 <RectLoader />
                                 <RectLoader />

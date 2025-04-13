@@ -53,17 +53,15 @@ const SubjectInfo = () => {
             setIsAuthorized(false)
     }, [user, isAdmin, subject?.creatorId])
 
-    // Count documents
-    const docsCount = useMemo(() => {
-        let totalDocs = 0
+    // Count the number of units and documents
+    const contentCount = useMemo(() => {
+        const allUnits = subject?.units || [];
+        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
 
-        if (subject) {
-            subject?.units?.forEach((unit) => {
-                totalDocs += unit?.documents?.length || 0
-            })
+        return {
+            units: allUnits.length,
+            documents: allDocuments.length,
         }
-
-        return totalDocs
     }, [subject])
 
     return (
@@ -108,12 +106,11 @@ const SubjectInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Units: {subject?.units?.length || 0}</span>
-                                <span>Documents: {docsCount}</span>
+                                <span>Units: {contentCount.units}</span>
+                                <span>Documents: {contentCount.documents}</span>
                             </>
                             :
                             <>
-                                <RectLoader />
                                 <RectLoader />
                                 <RectLoader />
                             </>

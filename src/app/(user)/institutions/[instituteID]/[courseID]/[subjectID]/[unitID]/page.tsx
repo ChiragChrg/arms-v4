@@ -199,8 +199,6 @@ const UnitInfo = () => {
                             :
                             <>
                                 <RectLoader />
-                                <RectLoader />
-                                <RectLoader />
                             </>
                         }
                     </div>

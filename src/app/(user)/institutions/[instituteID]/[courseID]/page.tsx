@@ -54,20 +54,18 @@ const CourseInfo = () => {
             setIsAuthorized(false)
     }, [user, isAdmin, course.creatorId]);
 
-    // Count documents
-    const docsCount = useMemo(() => {
-        let totalDocs = 0
+    // Count the number of subjects, units, and documents
+    const contentCount = useMemo(() => {
+        const allSubjects = course?.subjects || [];
+        const allUnits = allSubjects.flatMap(subject => subject?.units || []);
+        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
 
-        if (course) {
-            course?.subjects?.forEach((subject) => {
-                subject?.units?.forEach((unit) => {
-                    totalDocs += unit?.documents?.length || 0
-                })
-            })
+        return {
+            subjects: allSubjects.length,
+            units: allUnits.length,
+            documents: allDocuments.length,
         }
-
-        return totalDocs;
-    }, [course])
+    }, [course]);
 
     return (
         <section className='section_style'>
@@ -106,8 +104,9 @@ const CourseInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Subjects: {course?.subjects?.length || 0}</span>
-                                <span>Documents: {docsCount}</span>
+                                <span>Subjects: {contentCount.subjects}</span>
+                                <span>Units: {contentCount.units}</span>
+                                <span>Documents: {contentCount.documents}</span>
                             </>
                             :
                             <>
