@@ -5,12 +5,6 @@ type CreateInstitutionType = {
     instituteName: string,
     description: string,
     creatorId: string,
-
-    // Optional properties for the API request to match the InstitutionTypes interface
-    id?: never;
-    createdAt?: never;
-    courses?: never[];
-    creator?: never;
 }
 
 type UpdateInstitutionType = {
@@ -41,13 +35,7 @@ export const institutionAPISlice = createApi({
             onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     institutionAPISlice.util.updateQueryData("getAllInstitutions", undefined, (draft) => {
-                        draft.push({
-                            ...arg,
-                            id: "temp-id-" + Date.now(),
-                            createdAt: new Date(),
-                            courses: [],
-                            creator: undefined,
-                        });
+                        draft.push(arg as InstitutionTypes);
                     })
                 );
                 try {
