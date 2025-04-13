@@ -35,7 +35,6 @@ const UserAvatar = () => {
                 isApproved: false,
                 createdAt: null,
                 updatedAt: null,
-                accessToken: "",
             }
 
             dispatch(userActions.setUser(formattedUser))
@@ -55,7 +54,6 @@ const UserAvatar = () => {
                 isApproved: session.user.isApproved,
                 createdAt: session.user.createdAt,
                 updatedAt: session.user.updatedAt,
-                accessToken: session.user.accessToken,
             } as UserTypes
 
             dispatch(userActions.setUser(formattedUser))

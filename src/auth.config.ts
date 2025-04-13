@@ -24,16 +24,18 @@ export default {
                 let user = null
 
                 try {
-                    if (!credentials?.email || !credentials?.password) {
+                    const { email, password } = credentials as { email: string; password: string }
+
+                    // Check if credentials are provided
+                    if (!email || !password) {
                         return null
                     }
 
-                    const email = credentials?.email as string
-                    const password = credentials?.password as string
-
+                    // Fetch user from database
                     const userExists = await prisma.user.findUnique({ where: { email } })
                     const matchPassword = await bcrypt.compare(password, userExists?.password as string)
 
+                    // Check if user exists and password matches
                     if (!userExists?.email || !matchPassword) throw new Error("Invalid Email or Password")
 
                     user = {
@@ -47,14 +49,31 @@ export default {
                         createdAt: userExists.createdAt,
                     }
 
-                    console.log("\nCredentials:", user)
+                    // console.log("\nCredentials:", user)
                     return user
                 } catch (err) {
-                    console.log("\nCredentialsErr: ", err)
+                    console.error("\nCredentialsErr: ", err)
                     return null
                 }
             },
 
         }),
-    ]
+    ],
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.sub = user.id
+                token.isApproved = user.isApproved
+            }
+            return token
+        },
+        async session({ session, token }) {
+            if (token) {
+                session.user.id = token.sub as string
+                session.user.isApproved = token.isApproved as boolean
+            }
+            return session
+        },
+    },
+
 } satisfies NextAuthConfig

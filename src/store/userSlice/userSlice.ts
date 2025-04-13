@@ -12,7 +12,6 @@ const initialState = {
         isApproved: false,
         createdAt: null,
         updatedAt: null,
-        accessToken: "",
     },
     isAdmin: false,
     isLoading: true,

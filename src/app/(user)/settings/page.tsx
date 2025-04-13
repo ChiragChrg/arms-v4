@@ -67,9 +67,9 @@ const Settings = () => {
                 </div>
                 <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px]">Role</div>
-                    <div className="w-full pl-8">{isAdmin ? "Administrator" : user?.accessToken ? "Faculty" : "Student"}</div>
+                    <div className="w-full pl-8">{isAdmin ? "Administrator" : user?.isApproved ? "Faculty" : "Student"}</div>
                 </div>
-                {!isAdmin && user?.accessToken && <div className="flex border-2 p-2 rounded">
+                {!isAdmin && user?.isApproved && <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px]">Approval Status</div>
                     <div className="w-full pl-8">
                         {user?.isApproved ?

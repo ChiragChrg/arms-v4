@@ -7,7 +7,6 @@ export interface UserTypes {
     isApproved: boolean;
     createdAt: Date | null;
     updatedAt: Date | null;
-    accessToken: string;
 }
 
 export type UserState = {

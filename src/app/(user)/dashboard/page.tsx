@@ -19,6 +19,8 @@ const Dashboard = () => {
     // Get dashboard count data
     const { data: count } = useGetDashboardCountQuery({});
 
+    console.log(session?.user)
+
     return (
         <section className='section_style'>
             <MobileHeader />
