@@ -61,7 +61,7 @@ const CreateInstitute = () => {
             <NavRoute routes={["Institutions", "Institutions/Create"]} />
             <MobileHeader />
 
-            <h1 className="text-[1.8em] sm:text-[2em] 2xl:text-[3em] font-medium my-2 text-center">
+            <h1 className="text-[1.8em] sm:text-[2em] 2xl:text-[3em] font-medium my-2 text-center mt-4">
                 Create new <span className="text-primary">Institution</span>
             </h1>
 
