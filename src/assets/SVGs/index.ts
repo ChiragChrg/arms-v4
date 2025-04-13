@@ -7,6 +7,7 @@ export { default as NewCourseVector } from './NewCourseVector.svg'
 export { default as NewSubjectVector } from './NewSubjectVector.svg'
 export { default as NewUnitVector } from './NewUnitVector.svg'
 export { default as EmptyApprovalVector } from './EmptyApprovalVector.svg'
+export { default as EmptyVector } from './EmptyVector.svg'
 export { default as ForgotPasswordVector } from './ForgotPasswordVector.svg'
 export { default as ResetPasswordVector } from './ResetPasswordVector.svg'
 
