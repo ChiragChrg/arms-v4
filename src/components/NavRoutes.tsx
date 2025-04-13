@@ -39,7 +39,7 @@ const NavRoute = ({ defaultRoute = "dashboard", routes = [], className = "" }: P
                     <Fragment key={index}>
                         <ChevronRight size={18} className="text-slate-400" />
                         <Link href={`/${path?.toLowerCase()}`} className='capitalize last:text-primary last:font-medium'>
-                            {path?.includes("/") ? path?.split("/").pop() : path}
+                            {path?.includes("/") ? path?.split("/").pop()?.replaceAll("-", " ") : path.replaceAll("-", " ")}
                         </Link>
                     </Fragment>
                 )
