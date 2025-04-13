@@ -27,7 +27,7 @@ const Settings = () => {
             <MobileHeader />
             <h1 className='text-[2em] font-medium'>Settings</h1>
 
-            <div className="flex_center flex-col gap-4 mt-10">
+            <div className="flex_center flex-col gap-10 mt-10">
                 <div className="relative">
                     <div className="flex_center w-[125px] aspect-square rounded-full overflow-hidden">
                         <CircleLoader size='125px' className={isLoading ? 'block' : "hidden"} />
@@ -56,7 +56,7 @@ const Settings = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4 max-w-[600px] mx-auto mt-6">
+            <div className="flex flex-col gap-4 max-w-[600px] m-auto mt-20">
                 <div className="flex border-2 p-2 rounded">
                     <div className="border-r border-border/80 pl-1 w-fit min-w-[140px] sm:min-w-[200px]">Username</div>
                     <div className="w-full pl-8 overflow-hidden overflow-ellipsis">{user.name}</div>
@@ -90,7 +90,7 @@ const Settings = () => {
                     {deferredPrompt && <Button
                         variant="outline"
                         onClick={HandlePWAInstall}
-                        className='flex_center gap-2 w-full bg-gray-200 dark:bg-gray-500 hover:bg-gray-200'>
+                        className='flex flex-1/2 items-center gap-2 w-full bg-gray-200 dark:bg-gray-500 hover:bg-gray-200'>
                         <MonitorSmartphoneIcon />
                         <span>Install PWA App</span>
                     </Button>}
@@ -99,7 +99,7 @@ const Settings = () => {
                         variant="destructive"
                         onClick={() => dispatch(modalActions.show("LogoutModal"))}
                         style={{ margin: !deferredPrompt ? "2em auto" : "" }}
-                        className='flex_center gap-2 w-full sm:max-w-[300px]'>
+                        className='flex items-center gap-2 w-full sm:max-w-[300px]'>
                         <LogOutIcon />
                         <span>Logout</span>
                     </Button>
