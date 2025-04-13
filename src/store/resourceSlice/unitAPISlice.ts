@@ -26,8 +26,8 @@ export const unitAPISlice = createApi({
             query: () => "/all",
             providesTags: [API_TAGS.UNITS],
         }),
-        getUnitById: builder.query<UnitTypes, unknown>({
-            query: (id: string) => `/${id}`,
+        getUnitBySlug: builder.query<UnitTypes, unknown>({
+            query: (slug: string) => `/${slug}`,
             providesTags: (result) => [{ type: API_TAGS.UNIT, id: result?.id }],
         }),
         createUnit: builder.mutation({
@@ -106,7 +106,7 @@ export const unitAPISlice = createApi({
 
 export const {
     useGetAllUnitsQuery,
-    useGetUnitByIdQuery,
+    useGetUnitBySlugQuery,
     useCreateUnitMutation,
     useUpdateUnitMutation,
     useDeleteUnitMutation,

@@ -22,8 +22,8 @@ export const institutionAPISlice = createApi({
             query: () => "/all",
             providesTags: [API_TAGS.INSTITUTIONS],
         }),
-        getInstitutionById: builder.query<InstitutionTypes, unknown>({
-            query: (id: string) => `/${id}`,
+        getInstitutionBySlug: builder.query<InstitutionTypes, unknown>({
+            query: (slug: string) => `/${slug}`,
             providesTags: (result) => [{ type: API_TAGS.INSTITUTION, id: result?.id }],
         }),
         createInstitution: builder.mutation({
@@ -96,7 +96,7 @@ export const institutionAPISlice = createApi({
 
 export const {
     useGetAllInstitutionsQuery,
-    useGetInstitutionByIdQuery,
+    useGetInstitutionBySlugQuery,
     useCreateInstitutionMutation,
     useUpdateInstitutionMutation,
     useDeleteInstitutionMutation,

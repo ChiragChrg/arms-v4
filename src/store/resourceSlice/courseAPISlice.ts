@@ -24,8 +24,8 @@ export const courseAPISlice = createApi({
             query: () => "/all",
             providesTags: [API_TAGS.COURSES],
         }),
-        getCourseById: builder.query<CourseTypes, unknown>({
-            query: (id: string) => `/get/${id}`,
+        getCourseBySlug: builder.query<CourseTypes, unknown>({
+            query: (slug: string) => `/${slug}`,
             providesTags: (result) => [{ type: API_TAGS.COURSE, id: result?.id }],
         }),
         createCourse: builder.mutation({
@@ -98,7 +98,7 @@ export const courseAPISlice = createApi({
 
 export const {
     useGetAllCoursesQuery,
-    useGetCourseByIdQuery,
+    useGetCourseBySlugQuery,
     useCreateCourseMutation,
     useUpdateCourseMutation,
     useDeleteCourseMutation,

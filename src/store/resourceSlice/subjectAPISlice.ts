@@ -25,8 +25,8 @@ export const subjectAPISlice = createApi({
             query: () => "/all",
             providesTags: [API_TAGS.SUBJECTS],
         }),
-        getSubjectById: builder.query<SubjectTypes, unknown>({
-            query: (id: string) => `/${id}`,
+        getSubjectBySlug: builder.query<SubjectTypes, unknown>({
+            query: (slug: string) => `/${slug}`,
             providesTags: (result) => [{ type: API_TAGS.SUBJECT, id: result?.id }],
         }),
         createSubject: builder.mutation({
@@ -106,7 +106,7 @@ export const subjectAPISlice = createApi({
 
 export const {
     useGetAllSubjectsQuery,
-    useGetSubjectByIdQuery,
+    useGetSubjectBySlugQuery,
     useCreateSubjectMutation,
     useUpdateSubjectMutation,
     useDeleteSubjectMutation,
