@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { FormEvent, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from "next/image"
@@ -36,8 +37,8 @@ const CreateSubject = () => {
     const [createSubject, { isLoading }] = useCreateSubjectMutation();
 
     // Get Institute Data
-    const { id: courseId, courseName } = useMemo(() => {
-        return course?.find((obj: CourseTypes) => obj.courseName === params?.courseID.replaceAll("-", " ")) as CourseTypes;
+    const currentCourse = useMemo(() => {
+        return course?.find((obj: CourseTypes) => obj.courseName.toLowerCase() === params?.courseID.replaceAll("-", " ")) as CourseTypes;
     }, [params?.courseID, course])
 
     const HandleCreateSubject = async (e: FormEvent<HTMLFormElement>) => {
@@ -45,25 +46,21 @@ const CreateSubject = () => {
         if (isInvalid) return;
 
         try {
-            if (courseName.toLowerCase() === subjectName.toLowerCase())
+            if (currentCourse.courseName.toLowerCase() === subjectName.toLowerCase())
                 throw new Error("Subject name cannot be same as course name!")
 
-            const res = await createSubject({
+            await createSubject({
                 subjectName,
                 subjectDesc,
-                courseId,
+                courseId: currentCourse.id,
                 creatorId: user.id
             }).unwrap();
 
-            if (res.status === 201) {
-                toast.success("Subject Created Successfully!");
-                router.push(`/institutions/${params?.instituteID}/${params?.courseID}`);
-            } else {
-                toast.error(res.message);
-            }
-        } catch (error: unknown) {
-            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
-            toast.error(errorMessage);
+            toast.success("Subject Created Successfully!");
+            router.push(`/institutions/${params?.instituteID}/${params?.courseID}`);
+        } catch (error) {
+            toast.error((error as { data?: { error?: string } })?.data?.error || "Failed to create Subject");
+            console.error(error);
         }
     }
 

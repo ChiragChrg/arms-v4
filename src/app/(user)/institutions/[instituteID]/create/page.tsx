@@ -32,8 +32,8 @@ const CreateCourse = () => {
     const { data: institute } = useGetAllInstitutionsQuery({});
 
     // Get Institute Data
-    const { id: instituteId, instituteName } = useMemo(() => {
-        return institute?.find((obj: InstitutionTypes) => obj.instituteName === params?.instituteID.replaceAll("-", " ")) as InstitutionTypes;
+    const currentInstitute = useMemo(() => {
+        return institute?.find((obj: InstitutionTypes) => obj.instituteName.toLowerCase() === params?.instituteID.replaceAll("-", " ")) as InstitutionTypes;
     }, [params?.instituteID, institute])
 
     // Create Course Mutation Handler
@@ -44,25 +44,21 @@ const CreateCourse = () => {
         if (isInvalid) return;
 
         try {
-            if (instituteName.toLowerCase() === courseName.toLowerCase())
+            if (currentInstitute.instituteName.toLowerCase() === courseName.toLowerCase())
                 throw new Error("Course name cannot be same as institute name!");
 
-            const res = await createCourse({
+            await createCourse({
                 courseName,
                 courseDesc,
-                instituteId,
+                instituteId: currentInstitute.id,
                 creatorId: user.id
             }).unwrap();
 
-            if (res.status === 201) {
-                toast.success("Course Created Successfully!");
-                router.push(`/institutions/${params?.instituteID}`);
-            } else {
-                toast.error(res.message);
-            }
-        } catch (error: unknown) {
-            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
-            toast.error(errorMessage);
+            toast.success("Course Created Successfully!");
+            router.push(`/institutions/${params?.instituteID}`);
+        } catch (error) {
+            toast.error((error as { data?: { error?: string } })?.data?.error || "Failed to create Course");
+            console.error(error);
         }
     }
 

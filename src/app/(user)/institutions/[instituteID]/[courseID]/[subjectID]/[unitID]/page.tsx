@@ -66,7 +66,7 @@ const UnitInfo = () => {
 
     // Get Current Unit Data
     const unit = useMemo(() => {
-        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) || {} as UnitTypes;
+        return allUnits?.find((obj: UnitTypes) => obj.unitName.toLowerCase() === params?.unitID.replaceAll("-", " ")) || {} as UnitTypes;
     }, [params?.unitID, allUnits]);
 
     // Delete Document Mutation Handler

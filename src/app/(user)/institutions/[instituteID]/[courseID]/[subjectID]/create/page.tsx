@@ -33,8 +33,8 @@ const CreateUnit = () => {
     const { data: subject } = useGetAllSubjectsQuery({});
 
     // Get Subject Data
-    const { id: subjectId, subjectName } = useMemo(() => {
-        return subject?.find((obj: SubjectTypes) => obj.subjectName === params?.subjectID.replaceAll("-", " ")) as SubjectTypes;
+    const currentSubject = useMemo(() => {
+        return subject?.find((obj: SubjectTypes) => obj.subjectName.toLowerCase() === params?.subjectID.replaceAll("-", " ")) as SubjectTypes;
     }, [params?.subjectID, subject])
 
     // Create Unit Mutation Handler
@@ -45,25 +45,21 @@ const CreateUnit = () => {
         if (isInvalid) return;
 
         try {
-            if (subjectName.toLowerCase() === unitName.toLowerCase())
+            if (currentSubject.subjectName.toLowerCase() === unitName.toLowerCase())
                 throw new Error("Unit name cannot be same as Subject name!")
 
-            const res = await createUnit({
+            await createUnit({
                 unitName,
                 unitDesc,
-                subjectId,
+                subjectId: currentSubject.id,
                 creatorId: user.id
             }).unwrap();
 
-            if (res.status === 201) {
-                toast.success("Unit Created Successfully!");
-                router.push(`/institutions/${params?.instituteID}/${params?.courseID}/${params?.subjectID}`);
-            } else {
-                throw new Error(res?.message || "Something went wrong!");
-            }
-        } catch (error: unknown) {
-            const errorMessage = (error as Error)?.message || "An error occurred while creating the course.";
-            toast.error(errorMessage);
+            toast.success("Unit Created Successfully!");
+            router.push(`/institutions/${params?.instituteID}/${params?.courseID}/${params?.subjectID}`);
+        } catch (error) {
+            toast.error((error as { data?: { error?: string } })?.data?.error || "Failed to create Unit");
+            console.error(error);
         }
     }
 
