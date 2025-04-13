@@ -89,6 +89,9 @@ export interface InstitutionTypes {
 
 // #region API Tags
 export enum API_TAGS {
+    FACULTIES = "faculties",
+    FACULTY = "faculty",
+
     INSTITUTIONS = "institutions",
     INSTITUTION = "institution",
 

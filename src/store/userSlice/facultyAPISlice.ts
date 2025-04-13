@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { UserTypes } from '../types';
+import { API_TAGS, UserTypes } from '../types';
 
 type ApproveFacultyType = {
     facultyId: string;
@@ -9,12 +9,15 @@ type ApproveFacultyType = {
 export const facultyAPISlice = createApi({
     reducerPath: 'facultyAPISlice',
     baseQuery: fetchBaseQuery({ baseUrl: '/api/faculty' }),
+    tagTypes: [API_TAGS.FACULTIES, API_TAGS.FACULTY],
     endpoints: (builder) => ({
         getAllFaculty: builder.query<UserTypes[], unknown>({
             query: () => '/all',
+            providesTags: [API_TAGS.FACULTIES],
         }),
         getFacultyById: builder.query<UserTypes, string>({
             query: (id: string) => `/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.FACULTY, id: result?.id }],
         }),
         approveFaculty: builder.mutation({
             query: (formData: ApproveFacultyType) => ({
@@ -34,6 +37,7 @@ export const facultyAPISlice = createApi({
 
                 try {
                     await queryFulfilled;
+                    dispatch(facultyAPISlice.util.invalidateTags([API_TAGS.FACULTIES]));
                 } catch {
                     patchResult.undo();
                 }
@@ -55,6 +59,7 @@ export const facultyAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(facultyAPISlice.util.invalidateTags([API_TAGS.FACULTIES]));
                 } catch {
                     patchResult.undo();
                 }

@@ -5,7 +5,7 @@ export * from '@/store/sidebarSlice/sidebarSlice'
 
 // API Slice Imports
 export * from '@/store/authSlice/authAPISlice'
-export * from '@/store/facultySlice/facultyAPISlice'
+export * from '@/store/userSlice/facultyAPISlice'
 export * from '@/store/dashboardSlice/dashboardAPISlice'
 export * from '@/store/resourceSlice/institutionAPISlice'
 export * from '@/store/resourceSlice/courseAPISlice'
