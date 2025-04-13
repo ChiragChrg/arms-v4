@@ -10,7 +10,11 @@ export async function GET(
 
     try {
         const subject = await prisma.subject.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                units: true,
+                creator: true,
+            },
         });
 
         if (!subject) {

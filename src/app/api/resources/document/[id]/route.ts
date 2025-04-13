@@ -11,6 +11,9 @@ export async function GET(
     try {
         const document = await prisma.document.findUnique({
             where: { id },
+            include: {
+                creator: true,
+            },
         });
 
         if (!document) {

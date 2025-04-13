@@ -10,7 +10,11 @@ export async function GET(
 
     try {
         const unit = await prisma.unit.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                documents: true,
+                creator: true,
+            },
         });
 
         if (!unit) {

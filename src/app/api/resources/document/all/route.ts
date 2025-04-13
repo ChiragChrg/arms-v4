@@ -3,7 +3,11 @@ import { prisma } from "@/prisma";
 
 export async function GET() {
     try {
-        const documents = await prisma.document.findMany({});
+        const documents = await prisma.document.findMany({
+            include: {
+                creator: true,
+            },
+        });
 
         return NextResponse.json(documents, { status: 200 });
     } catch (err) {

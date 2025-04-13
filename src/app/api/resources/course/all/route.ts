@@ -3,7 +3,12 @@ import { prisma } from "@/prisma";
 
 export async function GET() {
     try {
-        const courses = await prisma.course.findMany({});
+        const courses = await prisma.course.findMany({
+            include: {
+                subjects: true,
+                creator: true,
+            },
+        });
 
         if (!courses) {
             return NextResponse.json({ error: "No courses found" }, { status: 404 });

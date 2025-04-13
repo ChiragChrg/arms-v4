@@ -3,7 +3,12 @@ import { prisma } from "@/prisma";
 
 export async function GET() {
     try {
-        const units = await prisma.unit.findMany({});
+        const units = await prisma.unit.findMany({
+            include: {
+                documents: true,
+                creator: true,
+            },
+        });
 
         return NextResponse.json(units, { status: 200 });
     } catch (err) {

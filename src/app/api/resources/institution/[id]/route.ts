@@ -13,6 +13,7 @@ export async function GET(
             where: { id },
             include: {
                 courses: true,
+                creator: true,
             },
         });
 

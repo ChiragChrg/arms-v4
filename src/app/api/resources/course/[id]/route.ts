@@ -10,7 +10,11 @@ export async function GET(
 
     try {
         const course = await prisma.course.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                subjects: true,
+                creator: true,
+            },
         });
 
         if (!course) {
