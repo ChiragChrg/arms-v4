@@ -4,13 +4,18 @@ import { prisma } from "@/prisma";
 // Get Unit by ID
 export async function GET(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
-        const unit = await prisma.unit.findUnique({
-            where: { id },
+        const unit = await prisma.unit.findFirst({
+            where: {
+                unitName: {
+                    contains: slug.replaceAll("-", " "),
+                    mode: 'insensitive'
+                }
+            },
             include: {
                 documents: true,
                 creator: true,

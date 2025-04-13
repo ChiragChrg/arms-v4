@@ -4,13 +4,18 @@ import { prisma } from "@/prisma";
 // Get Subject by ID
 export async function GET(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
-        const subject = await prisma.subject.findUnique({
-            where: { id },
+        const subject = await prisma.subject.findFirst({
+            where: {
+                subjectName: {
+                    contains: slug.replaceAll("-", " "),
+                    mode: 'insensitive'
+                }
+            },
             select: {
                 id: true,
                 subjectName: true,
@@ -27,7 +32,7 @@ export async function GET(
 
         // Fetch related content flatly
         const [units, documents] = await Promise.all([
-            prisma.unit.findMany({ where: { subjectId: id }, select: { id: true } }),
+            prisma.unit.findMany({ where: { subjectId: subject.id }, select: { id: true } }),
             prisma.document.findMany({ select: { id: true, unitId: true } }),
         ]);
 
