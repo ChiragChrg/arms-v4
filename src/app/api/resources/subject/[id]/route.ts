@@ -11,9 +11,13 @@ export async function GET(
     try {
         const subject = await prisma.subject.findUnique({
             where: { id },
-            include: {
-                units: true,
+            select: {
+                id: true,
+                subjectName: true,
+                subjectDesc: true,
+                createdAt: true,
                 creator: true,
+                units: true
             },
         });
 
@@ -21,7 +25,21 @@ export async function GET(
             return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
         }
 
-        return NextResponse.json(subject, { status: 200 });
+        // Fetch related content flatly
+        const [units, documents] = await Promise.all([
+            prisma.unit.findMany({ where: { subjectId: id }, select: { id: true } }),
+            prisma.document.findMany({ select: { id: true, unitId: true } }),
+        ]);
+
+        const unitIds = units.map(u => u.id);
+        const documentIds = documents.map(d => d.id);
+
+        const counts = {
+            units: unitIds.length,
+            documents: documentIds.length,
+        };
+
+        return NextResponse.json({ ...subject, counts }, { status: 200 });
     } catch (err) {
         console.error('Error fetching subject:', err);
         return NextResponse.json({ error: 'Uncaught Subject Error' }, { status: 500 });

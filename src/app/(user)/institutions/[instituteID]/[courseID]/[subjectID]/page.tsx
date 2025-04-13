@@ -53,17 +53,6 @@ const SubjectInfo = () => {
             setIsAuthorized(false)
     }, [user, isAdmin, subject?.creatorId])
 
-    // Count the number of units and documents
-    const contentCount = useMemo(() => {
-        const allUnits = subject?.units || [];
-        const allDocuments = allUnits.flatMap(unit => unit?.documents || []);
-
-        return {
-            units: allUnits.length,
-            documents: allDocuments.length,
-        }
-    }, [subject])
-
     return (
         <section className='section_style'>
             <NavRoute routes={[
@@ -106,8 +95,8 @@ const SubjectInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Units: {contentCount.units}</span>
-                                <span>Documents: {contentCount.documents}</span>
+                                <span>Units: {subject.counts.units}</span>
+                                <span>Documents: {subject.counts.documents}</span>
                             </>
                             :
                             <>

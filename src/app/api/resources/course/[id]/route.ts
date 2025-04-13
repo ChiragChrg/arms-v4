@@ -34,11 +34,12 @@ export async function GET(
 
         const subjectIds = subjects.map(s => s.id);
         const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
+        const documentIds = documents.filter(d => unitIds.includes(d.unitId)).map(d => d.id);
 
         const counts = {
             subjects: subjectIds.length,
             units: unitIds.length,
-            documents: documents.filter(d => unitIds.includes(d.unitId)).length,
+            documents: documentIds.length,
         };
 
         return NextResponse.json({ ...course, counts }, { status: 200 });

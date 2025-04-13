@@ -36,12 +36,13 @@ export async function GET(
         const courseIds = courses.map(c => c.id);
         const subjectIds = subjects.filter(s => courseIds.includes(s.courseId)).map(s => s.id);
         const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
+        const documentIds = documents.filter(d => unitIds.includes(d.unitId)).map(d => d.id);
 
         const counts = {
             courses: courseIds.length,
             subjects: subjectIds.length,
             units: unitIds.length,
-            documents: documents.filter(d => unitIds.includes(d.unitId)).length,
+            documents: documentIds.length,
         };
 
         return NextResponse.json({ ...institution, counts }, { status: 200 });
