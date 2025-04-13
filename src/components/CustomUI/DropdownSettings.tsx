@@ -193,7 +193,7 @@ const DropdownSettings = ({ title, deleteName, userId, isAuthorized, documentDat
         <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
             <Dialog open={open} onOpenChange={setOpen}>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className='bg-background/80 p-2 rounded-md'>
+                    <DropdownMenuTrigger className='bg-background/80 p-2 rounded-md cursor-pointer'>
                         <Settings2Icon />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className='mr-7 border border-primary/50 bg-background/80 backdrop-blur'>
@@ -206,7 +206,7 @@ const DropdownSettings = ({ title, deleteName, userId, isAuthorized, documentDat
                         {(isAuthorized) &&
                             <DropdownMenuItem>
                                 <DialogTrigger className='flex_center gap-2 !text-red-600 cursor-pointer'>
-                                    <Trash2Icon size={18} />
+                                    <Trash2Icon size={18} className='text-red-600' />
                                     <span>Delete {title}</span>
                                 </DialogTrigger>
                             </DropdownMenuItem>
@@ -238,9 +238,9 @@ const DropdownSettings = ({ title, deleteName, userId, isAuthorized, documentDat
                         </div>
                     </label>
 
-                    <DialogFooter className="flex-row gap-12 mt-4">
+                    <DialogFooter className="flex-row gap-4 mt-4">
                         <DialogClose asChild>
-                            <Button variant="secondary" className='flex_center gap-2 w-full'>
+                            <Button variant="secondary" className='flex items-center gap-2 flex-1/2 cursor-pointer'>
                                 <XIcon size={20} />
                                 <span>Cancel</span>
                             </Button>
@@ -250,7 +250,7 @@ const DropdownSettings = ({ title, deleteName, userId, isAuthorized, documentDat
                             variant="destructive"
                             onClick={handleDelete}
                             disabled={isDisabled}
-                            className='flex_center gap-2 w-full text-white deleteBtnBg'>
+                            className='flex items-center gap-2 flex-1/2 text-white deleteBtnBg cursor-pointer'>
                             {isLoading ?
                                 <>
                                     <Loader2Icon size={20} className='animate-spin' />

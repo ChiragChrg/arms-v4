@@ -1,26 +1,29 @@
 "use client"
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import BuildingSVG from '@/assets/Icons/BuildingSVG'
-import Logo from '@/assets/Icons/Logo'
-import { cn } from '@/lib/utils'
-import UserAvatar from './UserAvatar'
-import ThemeButton from './CustomUI/ThemeButton'
-import { BadgeInfoIcon, PieChart, Settings2, Users2, X } from 'lucide-react'
-import PWA from '@/lib/pwa'
 import { useDispatch, useSelector } from 'react-redux'
 import { SEL_ShowSidebar, SEL_User, sidebarActions } from '@/store'
+
+import { cn } from '@/lib/utils'
+import PWA from '@/lib/pwa'
+import UserAvatar from './UserAvatar'
+import ThemeButton from './CustomUI/ThemeButton'
+import Logo from '@/assets/Icons/Logo'
+import BuildingSVG from '@/assets/Icons/BuildingSVG'
+import { BadgeInfoIcon, PieChart, Settings2, Users2, X } from 'lucide-react'
 
 const Sidebar = () => {
     const [isMobile, setIsMobile] = useState<boolean>(false)
     const [isTablet, setIsTablet] = useState<boolean>(false)
-    const pathname = usePathname()
+
     const { isAdmin } = useSelector(SEL_User);
     const { showSidebar } = useSelector(SEL_ShowSidebar)
     const dispatch = useDispatch();
+    const pathname = usePathname();
 
-    useEffect(() => {
+    // This effect is used to handle the screen width and show/hide the sidebar accordingly
+    useLayoutEffect(() => {
         const updateScreenWidth = () => {
             if (typeof window === 'undefined') return
 
@@ -44,6 +47,7 @@ const Sidebar = () => {
         return () => window.removeEventListener('resize', updateScreenWidth)
     }, [dispatch])
 
+    // This effect is used to listen for the PWA install prompt event
     useEffect(() => {
         // Listening to PWA BeforeInstallPrompt
         PWA()

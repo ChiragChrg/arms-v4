@@ -81,7 +81,7 @@ const UserAvatar = () => {
             <Button
                 size="icon"
                 onClick={() => dispatch(modalActions.show("LogoutModal"))}
-                className='deleteBtnBg'
+                className='deleteBtnBg cursor-pointer'
                 name='Logout'
                 title='Logout'
                 disabled={status == "loading"}>
