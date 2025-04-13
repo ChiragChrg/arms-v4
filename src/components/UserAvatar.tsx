@@ -39,11 +39,7 @@ const UserAvatar = () => {
 
             dispatch(userActions.setUser(formattedUser))
             dispatch(userActions.setIsLoading(false))
-
-            setTimeout(() => {
-                dispatch(loaderActions.setShowLoader(false));
-
-            }, 2500)
+            dispatch(loaderActions.setShowLoader(false));
         } else if (status == "authenticated" && session.user) {
             const formattedUser = {
                 id: session.user.id,
@@ -58,10 +54,7 @@ const UserAvatar = () => {
 
             dispatch(userActions.setUser(formattedUser))
             dispatch(userActions.setIsLoading(false))
-
-            setTimeout(() => {
-                dispatch(loaderActions.setShowLoader(false));
-            }, 2500)
+            dispatch(loaderActions.setShowLoader(false));
         } else if (status === "unauthenticated") {
             router.push('/')
         }

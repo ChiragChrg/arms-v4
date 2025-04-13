@@ -11,10 +11,10 @@ export async function GET() {
         ]);
 
         const counts = {
-            institute: res[0],
-            course: res[1],
-            subject: res[2],
-            document: res[3],
+            institutes: res[0],
+            courses: res[1],
+            subjects: res[2],
+            documents: res[3],
         }
 
         return NextResponse.json(counts, { status: 200 })

@@ -34,9 +34,7 @@ const Header = ({ altLogo = false, altColor = false, className = "", disableAuth
         if ((isAnonymousUser || status === "authenticated") && !disableAuthRedirect) {
             router.push('/dashboard')
         } else if (status === "unauthenticated") {
-            setTimeout(() => {
-                dispatch(loaderActions.setShowLoader(false));
-            }, 2500)
+            dispatch(loaderActions.setShowLoader(false));
         }
     }, [router, disableAuthRedirect, status, dispatch])
 

@@ -3,7 +3,7 @@
 import CountUp from "react-countup"
 import Link from 'next/link'
 import { useSession } from "next-auth/react";
-import { useGetDashboardCountQuery } from "@/store";
+import { DashboardCount, useGetDashboardCountQuery } from "@/store";
 
 import { AlertCircle } from "lucide-react"
 import MobileHeader from '@/components/MobileHeader'
@@ -12,14 +12,20 @@ import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import DocumentsSVG from '@/assets/Icons/DocumentsSVG'
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
     const { data: session } = useSession();
+    const [count, setCount] = useState<DashboardCount>();
 
     // Get dashboard count data
-    const { data: count } = useGetDashboardCountQuery({});
+    const { data } = useGetDashboardCountQuery({});
 
-    console.log(session?.user)
+    useEffect(() => {
+        if (data) {
+            setCount(data)
+        }
+    }, [data])
 
     return (
         <section className='section_style'>

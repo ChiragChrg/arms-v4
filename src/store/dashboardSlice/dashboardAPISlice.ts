@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-type DashboardCount = {
+export type DashboardCount = {
     institutes: number;
     courses: number;
     subjects: number;
