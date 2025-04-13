@@ -53,8 +53,8 @@ const Faculty = () => {
                     </h1>
 
                     {isAdmin &&
-                        <Link href="./faculty/request" className='flex_center gap-2 text-[1em] bg-primary text-white rounded-sm px-2 py-1.5'>
-                            <UserCheck />
+                        <Link href="./faculty/request" className='flex_center gap-2 bg-primary text-white rounded-sm px-4 py-1.5'>
+                            <UserCheck size={20} />
                             <span className='hidden sm:block'>Pending</span>
                             <div className='relative flex_center gap-2'>Request
                                 {pendingApprovalCount != 0 &&
