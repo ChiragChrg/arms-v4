@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { CourseTypes } from "../types";
+import { API_TAGS, CourseTypes } from "../types";
+import { institutionAPISlice } from "./institutionAPISlice";
 
 type CreateCourseType = {
     courseName: string,
@@ -17,12 +18,15 @@ type UpdateCourseType = {
 export const courseAPISlice = createApi({
     reducerPath: "courseAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/course" }),
+    tagTypes: [API_TAGS.COURSES, API_TAGS.COURSE],
     endpoints: (builder) => ({
         getAllCourses: builder.query<CourseTypes[], unknown>({
             query: () => "/all",
+            providesTags: [API_TAGS.COURSES],
         }),
         getCourseById: builder.query<CourseTypes, unknown>({
             query: (id: string) => `/get/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.COURSE, id: result?.id }],
         }),
         createCourse: builder.mutation({
             query: (formData: CreateCourseType) => ({
@@ -38,6 +42,8 @@ export const courseAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
                 } catch {
                     patchResult.undo();
                 }
@@ -60,6 +66,8 @@ export const courseAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSE]));
                 } catch {
                     patchResult.undo();
                 }
@@ -78,6 +86,8 @@ export const courseAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
                 } catch {
                     patchResult.undo();
                 }

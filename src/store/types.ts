@@ -1,4 +1,4 @@
-// User types
+// #region User types
 export interface UserTypes {
     id: string;
     name: string;
@@ -14,8 +14,9 @@ export type UserState = {
     isAdmin: boolean;
     isLoading: boolean;
 }
+// #endRegion User types
 
-// Resource types
+// #region Resource types
 export interface DocumentTypes {
     id: string;
     documentName: string;
@@ -69,3 +70,23 @@ export interface InstitutionTypes {
     creator?: UserTypes;
     createdAt: Date | null;
 }
+// #endregion Resource types
+
+// #region API Tags
+export enum API_TAGS {
+    INSTITUTIONS = "institutions",
+    INSTITUTION = "institution",
+
+    COURSES = "courses",
+    COURSE = "course",
+
+    SUBJECTS = "subjects",
+    SUBJECT = "subject",
+
+    UNITS = "units",
+    UNIT = "unit",
+
+    DOCUMENTS = "documents",
+    DOCUMENT = "document",
+}
+// #endregion API Tags

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { InstitutionTypes } from "../types";
+import { API_TAGS, InstitutionTypes } from "../types";
 
 type CreateInstitutionType = {
     instituteName: string,
@@ -22,12 +22,15 @@ type UpdateInstitutionType = {
 export const institutionAPISlice = createApi({
     reducerPath: "institutionAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/institution" }),
+    tagTypes: [API_TAGS.INSTITUTIONS, API_TAGS.INSTITUTION],
     endpoints: (builder) => ({
         getAllInstitutions: builder.query<InstitutionTypes[], unknown>({
             query: () => "/all",
+            providesTags: [API_TAGS.INSTITUTIONS],
         }),
         getInstitutionById: builder.query<InstitutionTypes, unknown>({
             query: (id: string) => `/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.INSTITUTION, id: result?.id }],
         }),
         createInstitution: builder.mutation({
             query: (formData: CreateInstitutionType) => ({
@@ -49,6 +52,7 @@ export const institutionAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
                 } catch {
                     patchResult.undo();
                 }
@@ -71,6 +75,7 @@ export const institutionAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTION]));
                 } catch {
                     patchResult.undo();
                 }
@@ -92,6 +97,7 @@ export const institutionAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
                 } catch {
                     patchResult.undo();
                 }

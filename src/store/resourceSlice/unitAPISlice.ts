@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { UnitTypes } from "../types";
+import { API_TAGS, UnitTypes } from "../types";
+import { institutionAPISlice } from "./institutionAPISlice";
+import { courseAPISlice } from "./courseAPISlice";
+import { subjectAPISlice } from "./subjectAPISlice";
 
 type CreateUnitType = {
     unitName: string,
@@ -17,12 +20,15 @@ type UpdateUnitType = {
 export const unitAPISlice = createApi({
     reducerPath: "unitAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/unit" }),
+    tagTypes: [API_TAGS.UNITS, API_TAGS.UNIT],
     endpoints: (builder) => ({
         getAllUnits: builder.query<UnitTypes[], unknown>({
             query: () => "/all",
+            providesTags: [API_TAGS.UNITS],
         }),
         getUnitById: builder.query<UnitTypes, unknown>({
             query: (id: string) => `/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.UNIT, id: result?.id }],
         }),
         createUnit: builder.mutation({
             query: (formData: CreateUnitType) => ({
@@ -38,6 +44,10 @@ export const unitAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
                 } catch {
                     patchResult.undo();
                 }
@@ -60,6 +70,10 @@ export const unitAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
                 } catch {
                     patchResult.undo();
                 }
@@ -78,6 +92,10 @@ export const unitAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
                 } catch {
                     patchResult.undo();
                 }

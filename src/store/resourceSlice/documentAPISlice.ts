@@ -1,5 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { DocumentTypes } from "../types";
+import { API_TAGS, DocumentTypes } from "../types";
+import { institutionAPISlice } from "./institutionAPISlice";
+import { courseAPISlice } from "./courseAPISlice";
+import { subjectAPISlice } from "./subjectAPISlice";
+import { unitAPISlice } from "./unitAPISlice";
 
 type UploadDocumentType = {
     documentName: string;
@@ -23,12 +27,15 @@ type UpdateDocumentType = {
 export const documentAPISlice = createApi({
     reducerPath: "documentAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/document" }),
+    tagTypes: [API_TAGS.DOCUMENTS, API_TAGS.DOCUMENT],
     endpoints: (builder) => ({
         getAllDocuments: builder.query({
             query: () => "/all",
+            providesTags: [API_TAGS.DOCUMENTS],
         }),
         getDocumentById: builder.query({
             query: (id: string) => `/get/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.DOCUMENT, id: result?.id }],
         }),
         createDocument: builder.mutation({
             query: (formData: CreateDocumentType) => ({
@@ -44,6 +51,11 @@ export const documentAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
+                    dispatch(documentAPISlice.util.invalidateTags([API_TAGS.DOCUMENTS]));
                 } catch {
                     patchResult.undo();
                 }
@@ -66,6 +78,11 @@ export const documentAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
+                    dispatch(documentAPISlice.util.invalidateTags([API_TAGS.DOCUMENTS]));
                 } catch {
                     patchResult.undo();
                 }
@@ -84,6 +101,11 @@ export const documentAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
+                    dispatch(unitAPISlice.util.invalidateTags([API_TAGS.UNITS]));
+                    dispatch(documentAPISlice.util.invalidateTags([API_TAGS.DOCUMENTS]));
                 } catch {
                     patchResult.undo();
                 }

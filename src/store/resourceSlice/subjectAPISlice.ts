@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { SubjectTypes } from "../types";
+import { API_TAGS, SubjectTypes } from "../types";
+import { institutionAPISlice } from "./institutionAPISlice";
+import { courseAPISlice } from "./courseAPISlice";
 
 type CreateSubjectType = {
     subjectName: string,
@@ -17,12 +19,15 @@ type UpdateSubjectType = {
 export const subjectAPISlice = createApi({
     reducerPath: "subjectAPISlice",
     baseQuery: fetchBaseQuery({ baseUrl: "/api/resources/subject" }),
+    tagTypes: [API_TAGS.SUBJECTS, API_TAGS.SUBJECT],
     endpoints: (builder) => ({
         getAllSubjects: builder.query<SubjectTypes[], unknown>({
             query: () => "/all",
+            providesTags: [API_TAGS.SUBJECTS],
         }),
         getSubjectById: builder.query<SubjectTypes, unknown>({
             query: (id: string) => `/${id}`,
+            providesTags: (result) => [{ type: API_TAGS.SUBJECT, id: result?.id }],
         }),
         createSubject: builder.mutation({
             query: (formData: CreateSubjectType) => ({
@@ -38,6 +43,9 @@ export const subjectAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
                 }
                 catch {
                     patchResult.undo();
@@ -62,6 +70,9 @@ export const subjectAPISlice = createApi({
 
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
                 }
                 catch {
                     patchResult.undo();
@@ -81,6 +92,9 @@ export const subjectAPISlice = createApi({
                 );
                 try {
                     await queryFulfilled;
+                    dispatch(institutionAPISlice.util.invalidateTags([API_TAGS.INSTITUTIONS]));
+                    dispatch(courseAPISlice.util.invalidateTags([API_TAGS.COURSES]));
+                    dispatch(subjectAPISlice.util.invalidateTags([API_TAGS.SUBJECTS]));
                 }
                 catch {
                     patchResult.undo();
