@@ -26,7 +26,7 @@ export const subjectAPISlice = createApi({
         }),
         createSubject: builder.mutation({
             query: (formData: CreateSubjectType) => ({
-                url: "/",
+                url: '', // Same as '/'
                 method: "POST",
                 body: formData,
             }),
@@ -46,7 +46,7 @@ export const subjectAPISlice = createApi({
         }),
         updateSubject: builder.mutation({
             query: (formData: UpdateSubjectType) => ({
-                url: `/`,
+                url: '', // Same as '/'
                 method: "PUT",
                 body: formData,
             }),

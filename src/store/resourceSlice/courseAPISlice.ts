@@ -26,7 +26,7 @@ export const courseAPISlice = createApi({
         }),
         createCourse: builder.mutation({
             query: (formData: CreateCourseType) => ({
-                url: "/",
+                url: '', // Same as '/'
                 method: "POST",
                 body: formData,
             }),
@@ -45,7 +45,7 @@ export const courseAPISlice = createApi({
         }),
         updateCourse: builder.mutation({
             query: (formData: UpdateCourseType) => ({
-                url: `/`,
+                url: '', // Same as '/'
                 method: "PUT",
                 body: formData,
             }),

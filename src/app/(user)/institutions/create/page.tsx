@@ -32,20 +32,16 @@ const CreateInstitute = () => {
         if (isInvalid) return;
 
         try {
-            const res = await createInstitution({
+            await createInstitution({
                 instituteName,
                 description,
                 creatorId: user.id
             }).unwrap();
 
-            if (res.status === 201) {
-                toast.success("Institute Created Successfully!");
-                router.push("/institutions");
-            } else {
-                toast.error(res.message);
-            }
+            toast.success("Institute Created Successfully!");
+            router.push("/institutions");
         } catch (error) {
-            toast.error("Error while creating the institute.");
+            toast.error((error as { data?: { error?: string } })?.data?.error || "Failed to create institution");
             console.error(error);
         }
     }
@@ -69,7 +65,7 @@ const CreateInstitute = () => {
                 Create new <span className="text-primary">Institution</span>
             </h1>
 
-            <div className="flex justify-around items-center flex-col-reverse lg:flex-row gap-6 mt-14">
+            <div className="w-full h-[80%] flex justify-around items-center flex-col-reverse lg:flex-row gap-6">
                 <form onSubmit={HandleCreateInstitute} className='flex flex-col gap-3 2xl:gap-4'>
                     <label className="relative min-w-[350px]">
                         <p className='text-[0.9em] bg-background/0 px-1'>Institute Name</p>

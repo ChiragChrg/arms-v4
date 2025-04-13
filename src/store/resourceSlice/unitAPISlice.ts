@@ -26,7 +26,7 @@ export const unitAPISlice = createApi({
         }),
         createUnit: builder.mutation({
             query: (formData: CreateUnitType) => ({
-                url: "/",
+                url: '', // Same as '/'
                 method: "POST",
                 body: formData,
             }),
@@ -45,7 +45,7 @@ export const unitAPISlice = createApi({
         }),
         updateUnit: builder.mutation({
             query: (formData: UpdateUnitType) => ({
-                url: `/`,
+                url: '', // Same as '/'
                 method: "PUT",
                 body: formData,
             }),

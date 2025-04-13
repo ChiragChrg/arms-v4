@@ -32,7 +32,7 @@ export const documentAPISlice = createApi({
         }),
         createDocument: builder.mutation({
             query: (formData: CreateDocumentType) => ({
-                url: "/",
+                url: '', // Same as '/'
                 method: "POST",
                 body: formData,
             }),
@@ -51,7 +51,7 @@ export const documentAPISlice = createApi({
         }),
         updateDocument: builder.mutation({
             query: (formData: UpdateDocumentType) => ({
-                url: `/`,
+                url: '', // Same as '/'
                 method: "PUT",
                 body: formData,
             }),

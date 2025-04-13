@@ -31,7 +31,7 @@ export const institutionAPISlice = createApi({
         }),
         createInstitution: builder.mutation({
             query: (formData: CreateInstitutionType) => ({
-                url: "/",
+                url: '', // Same as '/'
                 method: "POST",
                 body: formData,
             }),
@@ -56,7 +56,7 @@ export const institutionAPISlice = createApi({
         }),
         updateInstitution: builder.mutation({
             query: (formData: UpdateInstitutionType) => ({
-                url: `/`,
+                url: '', // Same as '/'
                 method: "PUT",
                 body: formData,
             }),

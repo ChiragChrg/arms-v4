@@ -4,22 +4,22 @@ import { prisma } from "@/prisma";
 
 type CreateInstituteRequest = {
     instituteName: string,
-    instituteDesc: string,
+    description: string,
     creatorId: string
 }
 
 type UpdateInstituteRequest = {
     id: string,
     instituteName: string,
-    instituteDesc: string,
+    description: string,
 }
 
 // Create a new institution
 export async function POST(request: NextRequest) {
-    const { instituteName, instituteDesc, creatorId }: CreateInstituteRequest = await request.json();
+    const { instituteName, description, creatorId }: CreateInstituteRequest = await request.json();
 
     try {
-        if (!instituteName || !instituteDesc || !creatorId) {
+        if (!instituteName || !description || !creatorId) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         const newInstitution = await prisma.institute.create({
             data: {
                 instituteName: instituteName,
-                description: instituteDesc,
+                description: description,
                 creatorId,
             },
         });
@@ -54,10 +54,10 @@ export async function POST(request: NextRequest) {
 
 // Update an institution
 export async function PUT(request: NextRequest) {
-    const { id, instituteName, instituteDesc }: UpdateInstituteRequest = await request.json();
+    const { id, instituteName, description }: UpdateInstituteRequest = await request.json();
 
     try {
-        if (!id || !instituteName || !instituteDesc) {
+        if (!id || !instituteName || !description) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
             where: { id },
             data: {
                 instituteName,
-                description: instituteDesc,
+                description: description,
             },
         });
 
