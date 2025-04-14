@@ -21,8 +21,16 @@ export async function GET(
                 courseName: true,
                 courseDesc: true,
                 createdAt: true,
-                creator: true,
-                subjects: true
+                subjects: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             }
         });
 

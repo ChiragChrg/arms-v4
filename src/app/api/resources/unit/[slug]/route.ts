@@ -18,7 +18,15 @@ export async function GET(
             },
             include: {
                 documents: true,
-                creator: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             },
         });
 

@@ -10,8 +10,16 @@ export async function GET() {
                 subjectName: true,
                 subjectDesc: true,
                 createdAt: true,
-                creator: true,
-                units: true
+                units: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             },
         });
 

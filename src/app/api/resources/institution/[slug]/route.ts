@@ -21,8 +21,16 @@ export async function GET(
                 instituteName: true,
                 description: true,
                 createdAt: true,
-                creator: true,
-                courses: true
+                courses: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             }
         });
 

@@ -12,7 +12,15 @@ export async function GET(
         const document = await prisma.document.findUnique({
             where: { id },
             include: {
-                creator: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             },
         });
 

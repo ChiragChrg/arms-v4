@@ -5,7 +5,15 @@ export async function GET() {
     try {
         const documents = await prisma.document.findMany({
             include: {
-                creator: true,
+                creator: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                        isApproved: true,
+                    }
+                },
             },
         });
 
