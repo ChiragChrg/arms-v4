@@ -134,7 +134,7 @@ const Sidebar = () => {
             </div>
 
             {/* Radial Gradient background Overlay */}
-            <div className="absolute inset-0 bg-sidebarGradient dark:bg-sidebarGradientDark -z-10"></div>
+            <div className="absolute inset-0 sidebarGradient sidebarGradientDark -z-10"></div>
         </aside>
     )
 }

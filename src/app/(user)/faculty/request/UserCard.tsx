@@ -28,7 +28,7 @@ const UserCard = ({ user }: Props) => {
     }
 
     return (
-        <div className="flex_center flex-col gap-1 rounded-md py-4 bg-radialGradientDark dark:bg-radialGradientDark">
+        <div className="flex_center flex-col gap-1 rounded-md py-4 radialGradientDark radialGradientDark">
             {user.image ?
                 <Image
                     src={user.image}

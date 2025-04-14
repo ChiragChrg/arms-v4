@@ -15,7 +15,7 @@ type RecentDataType = {
     subtitle: string
 }
 
-const RecentSubjects = () => {
+const RecentTopics = () => {
     const [recentTopic, setRecentTopic] = useState<RecentDataType[]>([])
     const { user } = useSelector(SEL_User);
 
@@ -36,10 +36,10 @@ const RecentSubjects = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {recentTopic?.map((data, index) => (
-                        <Link href={data?.url} key={index} className="bg-primary/60 p-2 px-4 flex justify-start gap-6 rounded-md text-white">
+                        <Link href={data?.url} key={index} className="radialGradient radialGradientDark p-2 px-4 flex justify-start items-center gap-6 rounded-md text-white">
                             <OpenBookSVG size='50' />
                             <div className="flex flex-col">
-                                <span className="text-[0.8em] opacity-70 capitalize">{data?.subtitle}</span>
+                                <span className="text-[0.8em] capitalize">{data?.subtitle}</span>
                                 <h3 className="text-[1.2em] font-bold uppercase">{data?.title}</h3>
                             </div>
                         </Link>
@@ -49,4 +49,4 @@ const RecentSubjects = () => {
         )
 }
 
-export default RecentSubjects
+export default RecentTopics

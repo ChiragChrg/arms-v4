@@ -162,7 +162,7 @@
   }
 
   .sidebar_link_style {
-    @apply flex justify-start items-center gap-4 w-full px-4 py-2 rounded text-white bg-primary/60 dark:bg-[var(--sidebarLink)] drop-shadow
+    @apply flex justify-start items-center gap-4 w-full px-4 py-2 rounded text-white bg-white/20 dark:bg-[var(--sidebarLink)]
   }
 
   [data-scale="1.25"] {
@@ -251,23 +251,21 @@
 }
 
 /* Custom Gradients */
-.bg-radialGradient {
-  background: radial-gradient(circle at 10% 10%, hsla(var(--primary) / 0.6) 0%, hsla(var(--primary) / 0.35) 100%);
-}
-
-.bg-sidebarGradient {
-  background: radial-gradient(circle at 10% 10%, hsla(var(--sidebarClr) / 1) 0%, hsla(var(--sidebarClr) / 0.35) 100%);
-}
-
-.bg-alertGradient {
+.alertGradient {
   background: radial-gradient(circle at 50% 50%, hsl(60deg 100% 50% / 0.1) 0%, hsl(60deg 100% 50% / 0.3) 100%);
 }
 
-.bg-radialGradientDark {
-  background: radial-gradient(circle at 10% 10%, hsla(var(--primary) / 0.45) 0%, hsla(var(--primary) / 0.2) 100%);
+.radialGradient {
+  background: radial-gradient(circle at 10% 10%, hsla(var(--primary) / 0.7) 0%, hsla(var(--primary) / 0.5) 100%);
+}
+html.dark .radialGradientDark {
+  background: radial-gradient(circle at 10% 10%, hsla(var(--primary) / 0.6) 0%, hsla(var(--primary) / 0.4) 100%);
 }
 
-.bg-sidebarGradientDark {
+.sidebarGradient {
+  background: radial-gradient(circle at 10% 10%, hsla(var(--sidebarClr) / 1) 0%, hsla(var(--sidebarClr) / 0.8) 100%);
+}
+html.dark .sidebarGradientDark {
   background: radial-gradient(circle at 10% 10%, hsla(var(--sidebarClr) / 1) 0%, hsla(var(--sidebarClr) / 0.35) 100%);
 }
 

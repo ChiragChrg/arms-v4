@@ -55,7 +55,7 @@ const InstituteInfo = () => {
             <NavRoute routes={["Institutions", `.${pathname}`]} />
             <MobileHeader />
 
-            <div className="relative flex items-center gap-4 bg-radialGradient dark:bg-radialGradientDark sm:[background:hsl(var(--primary)/0.3)] rounded-md p-2 sm:p-3 mt-4">
+            <div className="relative flex items-center gap-4 radialGradient radialGradientDark sm:[background:hsl(var(--primary)/0.3)] rounded-md p-2 sm:p-3 mt-4">
                 <div className="absolute -top-2 -left-2 sm:top-auto sm:left-auto sm:relative w-fit sm:bg-primary/80 p-6 rounded-full text-white/40 dark:text-white/10 sm:text-white dark:sm:text-white">
                     <BuildingSVG size='80' />
                 </div>
@@ -137,7 +137,7 @@ const InstituteInfo = () => {
                         <Link
                             href={`${pathname}/${course?.courseName?.toLowerCase().replaceAll(" ", "-")}`}
                             key={index}
-                            className="flex_center flex-col w-full h-full rounded-md bg-radialGradient dark:bg-radialGradientDark px-2 py-4">
+                            className="flex_center flex-col w-full h-full rounded-md radialGradient radialGradientDark px-2 py-4">
                             <div className="w-fit bg-primary/80 p-4 rounded-full mb-4 text-white">
                                 <BookStackSVG size='40' />
                             </div>

@@ -7,7 +7,7 @@ import { DashboardCount, useGetDashboardCountQuery } from "@/store";
 
 import { AlertCircle } from "lucide-react"
 import MobileHeader from '@/components/MobileHeader'
-import RecentSubjects from "@/components/RecentSubjects"
+import RecentTopics from "@/components/RecentTopics"
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
@@ -37,36 +37,36 @@ const Dashboard = () => {
             </h1>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-8 sm:mx-8 2xl:mx-[10em] mt-4 2xl:mt-8">
-                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
+                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 radialGradient radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <BuildingSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.institutes || 0} duration={4} className='text-[2.5em] font-bold text-primary leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.institutes || 0} duration={4} className='text-[2.5em] font-bold text-white leading-[1.5em] mr-4 z-[1]' />
                     </div>
-                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Institutes registered</p>
+                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-white dark:text-white/80 z-[1]'>Institutes registered</p>
                 </div>
 
-                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
+                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 radialGradient radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <BookStackSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.courses || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.courses || 0} duration={4} className='text-[2.5em] font-bold text-white leading-[1.5em] mr-4 z-[1]' />
                     </div>
-                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Courses created</p>
+                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-white dark:text-white/80 z-[1]'>Courses created</p>
                 </div>
 
-                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
+                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 radialGradient radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <OpenBookSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.subjects || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.subjects || 0} duration={4} className='text-[2.5em] font-bold text-white leading-[1.5em] mr-4 z-[1]' />
                     </div>
-                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>Subjects created</p>
+                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-white dark:text-white/80 z-[1]'>Subjects created</p>
                 </div>
 
-                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 bg-radialGradient dark:bg-radialGradientDark">
+                <div className="relative rounded-md flex flex-col items-end overflow-hidden p-2.5 radialGradient radialGradientDark">
                     <div className="flex justify-between items-start w-full">
                         <DocumentsSVG size='50' className='text-white dark:text-white/80' />
-                        <CountUp end={count?.documents || 0} duration={4} className='text-[2.5em] font-bold text-primary drop-shadow leading-[1.5em] mr-4 z-[1]' />
+                        <CountUp end={count?.documents || 0} duration={4} className='text-[2.5em] font-bold text-white leading-[1.5em] mr-4 z-[1]' />
                     </div>
-                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-baseClr dark:text-white/80 z-[1]'>PDFs uploaded</p>
+                    <p className='w-full text-center text-[0.9em] sm:text-[1.1em] text-white dark:text-white/80 z-[1]'>Files uploaded</p>
                 </div>
             </div>
 
@@ -78,7 +78,7 @@ const Dashboard = () => {
             </Link>
 
             {(session?.user && !session.user.isApproved) &&
-                <div className="bg-alertGradient border border-yellow-400/40 w-fit mx-auto my-2 mt-8 px-4 py-2 text-center rounded-md">
+                <div className="alertGradient border border-yellow-400/40 w-fit mx-auto my-2 mt-8 px-4 py-2 text-center rounded-md">
                     <div className="flex_center gap-2 mb-2">
                         <AlertCircle size={20} />
                         User Approval Pending!
@@ -88,7 +88,7 @@ const Dashboard = () => {
                 </div>
             }
 
-            <RecentSubjects />
+            <RecentTopics />
         </section>
     )
 }
