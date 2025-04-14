@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -15,8 +15,8 @@ import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
 import { useSelector } from 'react-redux';
-import { SEL_User, useGetAllInstitutionsQuery } from '@/store';
-import { InstitutionTypes } from '@/store/types';
+import { SEL_User } from '@/store';
+import { useInstitution } from '@/hooks/useInstitution';
 
 type Params = {
     instituteID: string,
@@ -31,18 +31,14 @@ const InstituteInfo = () => {
     // Get User Data
     const { user, isAdmin } = useSelector(SEL_User);
 
-    // Get All Institutions Data
-    const { data: institutionList, isLoading } = useGetAllInstitutionsQuery({});
-
-    // Get Current Institute Data
-    const institute = useMemo(() => institutionList?.find((obj) => obj?.instituteName?.toLowerCase().replaceAll(" ", "-") === params?.instituteID) as InstitutionTypes, [institutionList, params?.instituteID]);
+    // Get Institute Data
+    const { institute, isLoading } = useInstitution(params.instituteID);
 
     // Redirect to 404 if institute not found
     useEffect(() => {
         if (!isLoading && !institute) {
-            toast.error("Institute not found!")
-            router.push("/404")
-            return;
+            toast.error("Institute not found")
+            router.push('/404')
         }
     }, [isLoading, institute, router])
 

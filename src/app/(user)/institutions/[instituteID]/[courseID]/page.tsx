@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 
@@ -14,9 +14,9 @@ import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
-import { SEL_User, useGetAllCoursesQuery } from '@/store';
+import { SEL_User } from '@/store';
 import { useSelector } from 'react-redux';
-import { CourseTypes } from '@/store/types';
+import { useCourse } from '@/hooks/useCourse';
 
 type Params = {
     instituteID: string,
@@ -32,11 +32,8 @@ const CourseInfo = () => {
     // Get user data
     const { user, isAdmin } = useSelector(SEL_User);
 
-    // Get all course data
-    const { data: courseList, isLoading } = useGetAllCoursesQuery({});
-
-    // Get Current course data
-    const course = useMemo(() => courseList?.find((obj) => obj?.courseName.toLowerCase().replaceAll(" ", "-") === params?.courseID.toLowerCase()) || {} as CourseTypes, [courseList, params?.courseID]);
+    // Get course data
+    const { course, isLoading } = useCourse(params.courseID);
 
     // If course not found, redirect to 404 page
     useEffect(() => {

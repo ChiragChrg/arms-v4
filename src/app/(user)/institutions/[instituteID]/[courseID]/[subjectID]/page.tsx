@@ -1,10 +1,10 @@
-"use client"
-import { useEffect, useMemo, useState } from 'react'
+"use client";
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
-import { SEL_User, useGetAllSubjectsQuery } from '@/store'
-import { SubjectTypes } from '@/store/types'
+import { SEL_User } from '@/store'
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -15,6 +15,7 @@ import { CircleLoader, RectLoader } from '@/components/CustomUI/Skeletons'
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import toast from 'react-hot-toast'
 import { BookOpenTextIcon, PlusIcon } from 'lucide-react'
+import { useSubject } from '@/hooks/useSubject'
 
 type Params = {
     instituteID: string,
@@ -31,11 +32,8 @@ const SubjectInfo = () => {
     // Get User Data
     const { user, isAdmin } = useSelector(SEL_User);
 
-    // Get All Subject Data
-    const { data: subjectList, isLoading } = useGetAllSubjectsQuery({});
-
-    // Get Current Subject Data
-    const subject = useMemo(() => subjectList?.find((subject) => subject.subjectName.toLowerCase().replaceAll(" ", "-") === params?.subjectID.toLowerCase()) || {} as SubjectTypes, [subjectList, params?.subjectID]);
+    // Get Subject Data
+    const { subject, isLoading } = useSubject(params.subjectID);
 
     // If subject not found, redirect to 404 page
     useEffect(() => {

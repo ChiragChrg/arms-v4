@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { useEdgeStore } from '@/lib/edgestore'
 import { getDownloadUrl } from '@edgestore/react/utils';
 import { useSelector } from 'react-redux';
-import { SEL_User, useDeleteDocumentMutation, useGetAllUnitsQuery } from '@/store';
-import { UnitTypes } from '@/store/types';
+import { SEL_User, useDeleteDocumentMutation } from '@/store';
 
 import NavRoute from '@/components/NavRoutes'
 import MobileHeader from '@/components/MobileHeader'
@@ -37,6 +36,7 @@ import {
     DialogFooter,
     DialogClose
 } from "@/components/ui/dialog"
+import { useUnit } from '@/hooks/useUnit';
 
 type Params = {
     instituteID: string,
@@ -62,12 +62,9 @@ const UnitInfo = () => {
 
     // Get User Data
     const { user, isAdmin } = useSelector(SEL_User);
-    const { data: allUnits } = useGetAllUnitsQuery({});
 
-    // Get Current Unit Data
-    const unit = useMemo(() => {
-        return allUnits?.find((obj: UnitTypes) => obj.unitName.toLowerCase() === params?.unitID.replaceAll("-", " ")) || {} as UnitTypes;
-    }, [params?.unitID, allUnits]);
+    // Get Unit Data
+    const { unit } = useUnit(params.unitID);
 
     // Delete Document Mutation Handler
     const [deleteDocument, { isLoading }] = useDeleteDocumentMutation();
