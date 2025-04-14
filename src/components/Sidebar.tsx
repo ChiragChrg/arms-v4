@@ -11,7 +11,7 @@ import UserAvatar from './UserAvatar'
 import ThemeButton from './CustomUI/ThemeButton'
 import Logo from '@/assets/Icons/Logo'
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
-import { BadgeInfoIcon, PieChart, Settings2, Users2, X } from 'lucide-react'
+import { InfoIcon, PieChart, Settings2, Users2, X } from 'lucide-react'
 
 const Sidebar = () => {
     const [isMobile, setIsMobile] = useState<boolean>(false)
@@ -54,7 +54,7 @@ const Sidebar = () => {
     }, [])
 
     return (
-        <header
+        <aside
             style={{
                 transform: isMobile ? `translateX(${showSidebar ? "0" : "-150%"})` : `translateX(0)`,
                 pointerEvents: showSidebar ? "auto" : "none",
@@ -69,7 +69,7 @@ const Sidebar = () => {
             </div>
 
             <div className="w-full flex justify-between items-center text-white">
-                <div className='flex_center gap-2'>
+                <div className='flex_center gap-3'>
                     <Logo
                         size='35'
                         fill="#fff"
@@ -77,7 +77,7 @@ const Sidebar = () => {
                     <p className='text-[2em] font-bold leading-8'>ARMS</p>
                 </div>
 
-                <ThemeButton />
+                <p className='font-bold leading-8'>v4.0.0</p>
             </div>
 
             <nav className='flex justify-between items-center flex-col gap-4 lg:gap-2 w-full mt-4 font-medium'>
@@ -113,23 +113,29 @@ const Sidebar = () => {
                     <span>Settings</span>
                 </Link>
 
-                <Link href={`/about`}
-                    onClick={() => isMobile && dispatch(sidebarActions.setShowSidebar(false))}
-                    className={cn('sidebar_link_style',
-                        pathname === `/about` && "text-baseClr bg-white dark:bg-white")}>
-                    <BadgeInfoIcon size={20} />
-                    <span>About</span>
-                </Link>
+
             </nav>
 
             <div className="flex_center flex-col gap-3 w-full mt-auto">
+                <div className="flex justify-between items-center w-full">
+                    <Link
+                        href={`/about`}
+                        onClick={() => isMobile && dispatch(sidebarActions.setShowSidebar(false))}
+                        className="flex_center size-10 rounded-full bg-transparent hover:!bg-transparent border border-white/30 sm:hover:bg-white text-white cursor-pointer">
+                        <InfoIcon size={24} />
+                    </Link>
+
+                    <ThemeButton />
+                </div>
+
                 <div className="w-full h-[1px] bg-white/20"></div>
+
                 <UserAvatar />
             </div>
 
             {/* Radial Gradient background Overlay */}
             <div className="absolute inset-0 bg-sidebarGradient dark:bg-sidebarGradientDark -z-10"></div>
-        </header>
+        </aside>
     )
 }
 
