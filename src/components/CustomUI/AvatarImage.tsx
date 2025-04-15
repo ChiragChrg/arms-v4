@@ -28,7 +28,7 @@ const AvatarImage = ({ url, size = 40 }: Props) => {
                     height={size}
                     onLoad={() => setIsLoading(false)}
                     loading='eager'
-                    className={isLoading ? 'hidden' : "block object-cover"}
+                    className={isLoading ? 'hidden' : "block object-cover aspect-square rounded-full"}
                 />
                 :
                 <div style={{ width: size, height: size }} className={isLoading ? 'hidden' : "flex_center bg-slate-400 text-white w-full aspect-square rounded-full"}>
