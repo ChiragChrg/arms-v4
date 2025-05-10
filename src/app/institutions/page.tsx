@@ -38,14 +38,9 @@ const Institutions = () => {
                     ))
                     :
                     <>
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
+                        {Array.from({ length: 12 }).map((_, index) => (
+                            <RectLoader key={index} height='11em' radius={0.375} />
+                        ))}
                     </>
                 }
             </div>

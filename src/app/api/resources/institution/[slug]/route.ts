@@ -4,9 +4,9 @@ import { prisma } from "@/prisma";
 // Get a institution by ID
 export async function GET(
     _request: NextRequest,
-    { params }: { params: Promise<{ slug: string }> }
+    { params }: { params: { slug: string } }
 ) {
-    const { slug } = await params;
+    const { slug } = params;
 
     try {
         const institution = await prisma.institute.findFirst({
@@ -21,7 +21,19 @@ export async function GET(
                 instituteName: true,
                 description: true,
                 createdAt: true,
-                courses: true,
+                courses: {
+                    include: {
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                                isApproved: true,
+                            }
+                        },
+                    }
+                },
                 creator: {
                     select: {
                         id: true,
@@ -38,27 +50,57 @@ export async function GET(
             return NextResponse.json({ error: "Institution not found" }, { status: 404 });
         }
 
-        // Fetch related content flatly
-        const [courses, subjects, units, documents] = await Promise.all([
-            prisma.course.findMany({ where: { instituteId: institution.id }, select: { id: true } }),
-            prisma.subject.findMany({ select: { id: true, courseId: true } }),
-            prisma.unit.findMany({ select: { id: true, subjectId: true } }),
-            prisma.document.findMany({ select: { id: true, unitId: true } }),
-        ]);
+        const courseIds = institution.courses.map(c => c.id);
 
-        const courseIds = courses.map(c => c.id);
-        const subjectIds = subjects.filter(s => courseIds.includes(s.courseId)).map(s => s.id);
-        const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
-        const documentIds = documents.filter(d => unitIds.includes(d.unitId)).map(d => d.id);
+        const subjects = await prisma.subject.findMany({
+            where: { courseId: { in: courseIds } },
+            select: { id: true, courseId: true },
+        });
 
-        const counts = {
-            courses: courseIds.length,
-            subjects: subjectIds.length,
-            units: unitIds.length,
-            documents: documentIds.length,
+        const subjectIds = subjects.map(s => s.id);
+
+        const units = await prisma.unit.findMany({
+            where: { subjectId: { in: subjectIds } },
+            select: { id: true, subjectId: true },
+        });
+
+        const unitIds = units.map(u => u.id);
+
+        const documents = await prisma.document.findMany({
+            where: { unitId: { in: unitIds } },
+            select: { id: true, unitId: true },
+        });
+
+        // Aggregate counts per course
+        const courseWithCounts = institution.courses.map(course => {
+            const courseSubjects = subjects.filter(s => s.courseId === course.id);
+            const courseSubjectIds = courseSubjects.map(s => s.id);
+            const courseUnits = units.filter(u => courseSubjectIds.includes(u.subjectId));
+            const courseUnitIds = courseUnits.map(u => u.id);
+            const courseDocuments = documents.filter(d => courseUnitIds.includes(d.unitId));
+
+            return {
+                ...course,
+                counts: {
+                    subjects: courseSubjects.length,
+                    units: courseUnits.length,
+                    documents: courseDocuments.length,
+                },
+            };
+        });
+
+        const updatedInstitution = {
+            ...institution,
+            courses: courseWithCounts,
+            counts: {
+                courses: courseIds.length,
+                subjects: subjects.length,
+                units: units.length,
+                documents: documents.length,
+            },
         };
 
-        return NextResponse.json({ ...institution, counts }, { status: 200 });
+        return NextResponse.json(updatedInstitution, { status: 200 });
 
     } catch (err) {
         console.error("Error fetching institution by ID:", err);

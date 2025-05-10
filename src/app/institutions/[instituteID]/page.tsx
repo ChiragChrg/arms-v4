@@ -11,12 +11,12 @@ import DropdownSettings from '@/components/CustomUI/DropdownSettings'
 import { CircleLoader, RectLoader } from '@/components/CustomUI/Skeletons'
 
 import BuildingSVG from '@/assets/Icons/BuildingSVG'
-import BookStackSVG from '@/assets/Icons/BookStackSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
 import { useSelector } from 'react-redux';
 import { SEL_User } from '@/store';
 import { useInstitution } from '@/hooks/useInstitution';
+import CourseCard from '@/components/Cards/CourseCard';
 
 type Params = {
     instituteID: string,
@@ -48,7 +48,7 @@ const InstituteInfo = () => {
             setIsAuthorized(true)
         else
             setIsAuthorized(false)
-    }, [user, isAdmin, institute?.creatorId])
+    }, [user, isAdmin, institute])
 
     return (
         <section className='section_style'>
@@ -72,7 +72,7 @@ const InstituteInfo = () => {
                         {!isLoading ?
                             <>
                                 <h1 className='text-[1.8em] sm:text-[2em] font-medium drop-shadow'>{institute?.instituteName}</h1>
-                                <p className='opacity-90 text-center'>{institute?.description}</p>
+                                <p className='opacity-90 text-center'>{institute.description}</p>
                             </>
                             :
                             <>
@@ -106,9 +106,9 @@ const InstituteInfo = () => {
                         <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={institute?.creator?.image} size={25} />
+                                <AvatarImage url={institute.creator?.image} size={25} />
 
-                                <span>{institute?.creator?.name}</span>
+                                <span>{institute.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">
@@ -123,7 +123,7 @@ const InstituteInfo = () => {
             <div className="flex justify-between items-center py-4">
                 <h2 className='text-[1.7em] font-medium'>Courses</h2>
                 {user?.isApproved &&
-                    <Link href={`./${institute?.instituteName?.toLowerCase().replaceAll(" ", "-")}/create`} className='flex_center gap-2 text-[1em] bg-primary text-white rounded-sm px-2 py-1.5'>
+                    <Link href={`./${institute?.instituteName.toLowerCase().replaceAll(" ", "-")}/create`} className='flex_center gap-2 text-[1em] bg-primary text-white rounded-sm px-2 py-1.5'>
                         <PlusIcon />
                         <span>Create</span>
                         <span className='hidden sm:block'>Course</span>
@@ -134,25 +134,13 @@ const InstituteInfo = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.25em] mb-6">
                 {!isLoading ?
                     institute?.courses?.map((course, index) => (
-                        <Link
-                            href={`${pathname}/${course?.courseName?.toLowerCase().replaceAll(" ", "-")}`}
-                            key={index}
-                            className="flex_center flex-col w-full h-full rounded-md radialGradient radialGradientDark px-2 py-4">
-                            <div className="w-fit bg-primary/80 p-4 rounded-full mb-4 text-white">
-                                <BookStackSVG size='40' />
-                            </div>
-                            <span className="text-[1.4em] font-medium">{course?.courseName}</span>
-                            <p className="w-full max-h-[45px] text-center text-[0.925em] opacity-80">{course?.courseDesc}</p>
-                        </Link>
+                        <CourseCard key={index} course={course} />
                     ))
                     :
                     <>
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
-                        <RectLoader height='11em' radius={0.375} />
+                        {Array.from({ length: 12 }).map((_, index) => (
+                            <RectLoader key={index} height='11em' radius={0.375} />
+                        ))}
                     </>
                 }
             </div>
