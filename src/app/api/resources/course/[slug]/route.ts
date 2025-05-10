@@ -21,7 +21,19 @@ export async function GET(
                 courseName: true,
                 courseDesc: true,
                 createdAt: true,
-                subjects: true,
+                subjects: {
+                    include: {
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                                isApproved: true,
+                            }
+                        }
+                    }
+                },
                 creator: {
                     select: {
                         id: true,
@@ -38,24 +50,41 @@ export async function GET(
             return NextResponse.json({ error: 'Course not found' }, { status: 404 });
         }
 
-        // Fetch related content flatly
-        const [subjects, units, documents] = await Promise.all([
-            prisma.subject.findMany({ where: { courseId: course.id }, select: { id: true } }),
-            prisma.unit.findMany({ select: { id: true, subjectId: true } }),
-            prisma.document.findMany({ select: { id: true, unitId: true } }),
-        ]);
+        const subjectIds = course.subjects.map(s => s.id);
+        const units = await prisma.unit.findMany({
+            where: { subjectId: { in: subjectIds } },
+            select: { id: true, subjectId: true },
+        });
+        const unitIds = units.map(u => u.id);
+        const documents = await prisma.document.findMany({
+            where: { unitId: { in: unitIds } },
+            select: { id: true, unitId: true },
+        });
 
-        const subjectIds = subjects.map(s => s.id);
-        const unitIds = units.filter(u => subjectIds.includes(u.subjectId)).map(u => u.id);
-        const documentIds = documents.filter(d => unitIds.includes(d.unitId)).map(d => d.id);
+        const subjectWithCounts = course.subjects.map(subject => {
+            const subjectUnits = units.filter(unit => unit.subjectId === subject.id);
+            const subjectDocuments = documents.filter(document => subjectUnits.some(unit => unit.id === document.unitId));
 
-        const counts = {
-            subjects: subjectIds.length,
-            units: unitIds.length,
-            documents: documentIds.length,
+            return {
+                ...subject,
+                counts: {
+                    units: subjectUnits.length,
+                    documents: subjectDocuments.length,
+                }
+            };
+        });
+
+        const updatedCourse = {
+            ...course,
+            subjects: subjectWithCounts,
+            counts: {
+                subjects: course.subjects.length,
+                units: units.length,
+                documents: documents.length,
+            },
         };
 
-        return NextResponse.json({ ...course, counts }, { status: 200 });
+        return NextResponse.json(updatedCourse, { status: 200 });
     } catch (err) {
         console.error('Error fetching course:', err);
         return NextResponse.json({ error: 'Uncaught Course Error' }, { status: 500 });

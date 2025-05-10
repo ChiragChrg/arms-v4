@@ -11,12 +11,12 @@ import DropdownSettings from '@/components/CustomUI/DropdownSettings'
 import { CircleLoader, RectLoader } from '@/components/CustomUI/Skeletons'
 
 import BookStackSVG from '@/assets/Icons/BookStackSVG'
-import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import toast from 'react-hot-toast'
 import { PlusIcon } from 'lucide-react'
 import { SEL_User } from '@/store';
 import { useSelector } from 'react-redux';
 import { useCourse } from '@/hooks/useCourse';
+import SubjectCard from '@/components/Cards/SubjectCard';
 
 type Params = {
     instituteID: string,
@@ -45,11 +45,11 @@ const CourseInfo = () => {
 
     // Grant DELETE access if user is ADMIN or the CREATOR
     useEffect(() => {
-        if (isAdmin || user.id === course.creatorId)
+        if (isAdmin || user.id === course?.creatorId)
             setIsAuthorized(true)
         else
             setIsAuthorized(false)
-    }, [user, isAdmin, course.creatorId]);
+    }, [user, isAdmin, course]);
 
     return (
         <section className='section_style'>
@@ -131,16 +131,7 @@ const CourseInfo = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.25em]">
                 {course?.subjects?.map((obj, index) => (
-                    <Link
-                        href={`${pathname}/${obj?.subjectName?.toLowerCase().replaceAll(" ", "-")}`}
-                        key={index}
-                        className="flex_center flex-col w-full h-full rounded-md radialGradient radialGradientDark px-2 py-4">
-                        <div className="w-fit bg-primary/80 p-4 rounded-full mb-4 text-white">
-                            <OpenBookSVG size='40' />
-                        </div>
-                        <span className="text-[1.4em] font-medium">{obj?.subjectName}</span>
-                        <p className="w-full max-h-[45px] text-center text-[0.925em] opacity-80">{obj?.subjectDesc}</p>
-                    </Link>
+                    <SubjectCard key={index} subject={obj} path={`${pathname}/${obj?.subjectName?.toLowerCase().replaceAll(" ", "-")}`} />
                 ))}
             </div>
         </section>

@@ -9,7 +9,6 @@ type CourseCardProps = {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
-    console.log(course)
     return (
         <Link
             href={`./institutions/${course.courseName?.toLowerCase().replaceAll(" ", "-")}`}
