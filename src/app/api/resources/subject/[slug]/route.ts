@@ -21,7 +21,19 @@ export async function GET(
                 subjectName: true,
                 subjectDesc: true,
                 createdAt: true,
-                units: true,
+                units: {
+                    include: {
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                                isApproved: true,
+                            }
+                        }
+                    }
+                },
                 creator: {
                     select: {
                         id: true,

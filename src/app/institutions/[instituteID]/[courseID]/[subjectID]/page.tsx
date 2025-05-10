@@ -14,8 +14,9 @@ import { CircleLoader, RectLoader } from '@/components/CustomUI/Skeletons'
 
 import OpenBookSVG from '@/assets/Icons/OpenBookSVG'
 import toast from 'react-hot-toast'
-import { BookOpenTextIcon, PlusIcon } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useSubject } from '@/hooks/useSubject'
+import UnitCard from '@/components/Cards/UnitCard';
 
 type Params = {
     instituteID: string,
@@ -134,16 +135,7 @@ const SubjectInfo = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.25em]">
                 {subject?.units?.map((obj, index) => (
-                    <Link
-                        href={`${pathname}/${obj?.unitName?.toLowerCase().replaceAll(" ", "-")}`}
-                        key={index}
-                        className="flex_center flex-col w-full h-full rounded-md radialGradient radialGradientDark px-2 py-4">
-                        <div className="w-fit bg-primary/80 p-4 rounded-full mb-4 text-white">
-                            <BookOpenTextIcon size='40' />
-                        </div>
-                        <span className="text-[1.4em] font-medium">{obj?.unitName}</span>
-                        <p className="w-full max-h-[45px] text-center text-[0.925em] opacity-80">{obj?.unitDesc}</p>
-                    </Link>
+                    <UnitCard key={index} unit={obj} path={`${pathname}/${obj?.unitName?.toLowerCase().replaceAll(" ", "-")}`} />
                 ))}
             </div>
         </section>
