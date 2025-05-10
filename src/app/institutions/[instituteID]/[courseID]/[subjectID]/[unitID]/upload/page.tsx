@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useEdgeStore } from '@/lib/edgestore';
 import { useSelector } from 'react-redux';
-import { UnitTypes } from '@/store/types';
-import { SEL_User, useCreateDocumentMutation, useGetAllUnitsQuery } from '@/store';
+import { SEL_User, useCreateDocumentMutation, useGetUnitBySlugQuery } from '@/store';
 
 import { MultiFileDropzone, type FileState } from './FileDropZone'
 import NavRoute from '@/components/NavRoutes'
@@ -26,6 +25,7 @@ type Params = {
 
 type FileUploadRes = {
     documentName: string;
+    documentDesc: string;
     type: string;
     size: string;
     link: string;
@@ -40,12 +40,7 @@ const UploadDocuments = () => {
 
     // Get User Data
     const { user } = useSelector(SEL_User);
-    const { data: allUnits } = useGetAllUnitsQuery({});
-
-    // Get Current Unit Data
-    const unit = useMemo(() => {
-        return allUnits?.find((obj: UnitTypes) => obj.unitName === params?.unitID.replaceAll("-", " ")) as UnitTypes;
-    }, [params?.unitID, allUnits]);
+    const { data: unit } = useGetUnitBySlugQuery(params?.unitID.replaceAll("-", " "));
 
     // Create Documents Mutation Handler
     const [createDocuments] = useCreateDocumentMutation();
@@ -70,7 +65,7 @@ const UploadDocuments = () => {
 
     // Uploading File
     const uploadFiles = async () => {
-        if (!user.id) return
+        if (!user.id || !unit) return
 
         // File Upload Meta Data
         const uploadMeta: FileUploadRes[] = []
@@ -96,6 +91,7 @@ const UploadDocuments = () => {
                     // Adding file info to uploadMeta
                     uploadMeta.push({
                         documentName: fileState.file.name,
+                        documentDesc: "",
                         type: fileState.file.type,
                         size: `${(res.size / 1024).toFixed(2)} KB`,
                         link: res.url,

@@ -134,11 +134,11 @@ const UnitInfo = () => {
 
     // Grant DELETE access if user is ADMIN or the CREATOR
     useEffect(() => {
-        if (isAdmin || user.id === unit.creatorId)
+        if (isAdmin || user.id === unit?.creatorId)
             setIsAuthorized(true)
         else
             setIsAuthorized(false)
-    }, [user, isAdmin, unit.creatorId])
+    }, [user, isAdmin, unit])
 
     // Convert file url to a download link
     const handleDownload = async (fileUrl: string, fileName: string) => {
@@ -191,7 +191,7 @@ const UnitInfo = () => {
                     <div className="w-full flex justify-between sm:justify-center items-center gap-2 sm:gap-10 text-[0.9em]">
                         {!isLoading ?
                             <>
-                                <span>Documents: {unit.documents?.length || 0}</span>
+                                <span>Documents: {unit?.documents?.length || 0}</span>
                             </>
                             :
                             <>
@@ -204,8 +204,8 @@ const UnitInfo = () => {
                         <span>Creator : </span>
                         {!isLoading ?
                             <div className="flex_center gap-2">
-                                <AvatarImage url={unit.creator?.image} size={25} />
-                                <span>{unit.creator?.name}</span>
+                                <AvatarImage url={unit?.creator?.image} size={25} />
+                                <span>{unit?.creator?.name}</span>
                             </div>
                             :
                             <div className="w-[150px] flex_center gap-2">
@@ -276,7 +276,7 @@ const UnitInfo = () => {
                                         size='icon'
                                         title='Download'
                                         onClick={() => handleDownload(doc?.link, doc?.documentName)}
-                                        className='flex_center bg-primary text-white rounded-md h-10 w-full p-2'>
+                                        className='flex_center bg-primary text-white rounded-md h-10 w-1/2 p-2 cursor-pointer'>
                                         <DownloadCloudIcon />
                                     </Button>
 
@@ -287,7 +287,7 @@ const UnitInfo = () => {
                                                     variant='destructive'
                                                     size='icon'
                                                     title='Delete'
-                                                    className='w-full p-2 text-white deleteBtnBg'>
+                                                    className='w-1/2 p-2 text-white deleteBtnBg cursor-pointer'>
                                                     <Trash2Icon />
                                                 </Button>
                                             </DialogTrigger>
@@ -298,9 +298,9 @@ const UnitInfo = () => {
                                                         This action cannot be undone. This will permanently delete the document.
                                                     </DialogDescription>
                                                 </DialogHeader>
-                                                <DialogFooter className="flex-row gap-12 mt-4">
+                                                <DialogFooter className="w-full flex gap-6 mt-4">
                                                     <DialogClose asChild>
-                                                        <Button variant="secondary" className='flex_center gap-2 w-full'>
+                                                        <Button variant="secondary" className='flex_center flex-1 gap-2 cursor-pointer'>
                                                             <XIcon size={20} />
                                                             <span>Cancel</span>
                                                         </Button>
@@ -309,7 +309,7 @@ const UnitInfo = () => {
                                                     <Button
                                                         variant="destructive"
                                                         onClick={() => deleteFiles(doc?.link, doc?.id)}
-                                                        className='flex_center gap-2 w-full text-white deleteBtnBg'>
+                                                        className='flex_center flex-1 gap-2 text-white deleteBtnBg cursor-pointer'>
                                                         <Trash2Icon size={20} />
                                                         <span>Delete</span>
                                                     </Button>
