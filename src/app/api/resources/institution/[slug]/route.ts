@@ -4,9 +4,9 @@ import { prisma } from "@/prisma";
 // Get a institution by ID
 export async function GET(
     _request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { slug } = params;
+    const { slug } = await params;
 
     try {
         const institution = await prisma.institute.findFirst({
