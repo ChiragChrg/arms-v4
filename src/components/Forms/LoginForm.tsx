@@ -32,7 +32,8 @@ const LoginForm = () => {
                 callbackUrl: callback || "/dashboard"
             })
 
-            if (res?.status === 200) {
+
+            if (res?.status === 200 && res.url) {
                 toast.success("Logged in Successfully!", {
                     id: LoginToastID
                 })
@@ -123,7 +124,7 @@ const LoginForm = () => {
             <div className="flex_center gap-4 w-full sm:px-4">
                 {/* Google Login Button */}
                 <button
-                    className='bg-foreground/10 sm:bg-background text-textClr w-full flex_center gap-4 p-2 rounded disabled:cursor-not-allowed'
+                    className='bg-foreground/10 text-textClr w-full flex_center gap-4 p-2 rounded disabled:cursor-not-allowed cursor-pointer'
                     onClick={() => HandleOAuthLogin("google")}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +154,7 @@ const LoginForm = () => {
 
                 {/* GitHUb Login Button */}
                 <button
-                    className='bg-foreground/10 sm:bg-background text-textClr w-full flex_center gap-4 p-2 rounded disabled:cursor-not-allowed'
+                    className='bg-foreground/10 text-textClr w-full flex_center gap-4 p-2 rounded disabled:cursor-not-allowed cursor-pointer'
                     onClick={() => HandleOAuthLogin("github")}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" className='w-[30px] h-[30px]'>
                         <path

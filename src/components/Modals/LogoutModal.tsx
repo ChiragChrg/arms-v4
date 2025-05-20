@@ -18,7 +18,7 @@ const LogoutModal = () => {
         dispatch(loaderActions.setShowLoader(true));
 
         try {
-            signOut({
+            await signOut({
                 callbackUrl: "/",
                 redirect: false
             })

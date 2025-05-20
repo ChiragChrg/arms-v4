@@ -15,13 +15,17 @@ export const facultyAPISlice = createApi({
             query: () => '/all',
             providesTags: [API_TAGS.FACULTIES],
         }),
+        getFacultyRequest: builder.query<UserTypes[], unknown>({
+            query: () => '/request',
+            providesTags: [API_TAGS.FACULTIES],
+        }),
         getFacultyById: builder.query<UserTypes, string>({
             query: (id: string) => `/${id}`,
             providesTags: (result) => [{ type: API_TAGS.FACULTY, id: result?.id }],
         }),
         approveFaculty: builder.mutation({
             query: (formData: ApproveFacultyType) => ({
-                url: `/approve`,
+                url: ``,
                 method: 'POST',
                 body: formData,
             }),
@@ -70,6 +74,7 @@ export const facultyAPISlice = createApi({
 
 export const {
     useGetAllFacultyQuery,
+    useGetFacultyRequestQuery,
     useGetFacultyByIdQuery,
     useApproveFacultyMutation,
     useDeleteFacultyMutation,

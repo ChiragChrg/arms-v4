@@ -7,7 +7,8 @@ export async function GET() {
             where: {
                 id: {
                     not: process.env.NEXT_PUBLIC_ARMS_ADMIN_UID,
-                }
+                },
+                isApproved: false,
             },
             select: {
                 id: true,

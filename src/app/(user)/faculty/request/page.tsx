@@ -4,7 +4,7 @@ import { useLayoutEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useSelector } from 'react-redux';
-import { SEL_User, useGetAllFacultyQuery } from '@/store';
+import { SEL_User, useGetFacultyRequestQuery } from '@/store';
 
 import UserCard from './UserCard'
 import MobileHeader from '@/components/MobileHeader'
@@ -23,7 +23,7 @@ const Request = () => {
     }, [isAdmin, router])
 
     // Fetch Faculty Request List
-    const { data: FacultyList } = useGetAllFacultyQuery(undefined, {});
+    const { data: FacultyRequestList } = useGetFacultyRequestQuery(undefined, {});
 
     if (isAdmin)
         return (
@@ -36,9 +36,9 @@ const Request = () => {
                     <span className="text-primary"> Request</span>
                 </h1>
 
-                {FacultyList?.length !== 0 ?
+                {FacultyRequestList?.length !== 0 ?
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 my-4">
-                        {FacultyList?.map((user, index) => {
+                        {FacultyRequestList?.map((user, index) => {
                             if (user?.isApproved) return;
 
                             return (

@@ -18,12 +18,11 @@ const UserCard = ({ user }: Props) => {
     const [approveFaculty, { isLoading }] = useApproveFacultyMutation()
 
     const handleApproval = async ({ facultyId, approval }: MutationType) => {
-        const res = await approveFaculty({ facultyId, approval }).unwrap();
-
-        if (res?.status === 200) {
-            toast.success(`Faculty ${approval}ed successfully!`)
-        } else {
-            toast.error("Something went wrong!")
+        try {
+            await approveFaculty({ facultyId, approval }).unwrap();
+            toast.success(`Faculty ${approval}ed successfully!`);
+        } catch {
+            toast.error("Something went wrong!");
         }
     }
 
@@ -50,7 +49,7 @@ const UserCard = ({ user }: Props) => {
             <div className="flex_center gap-4 mt-2 w-full px-8">
                 <Button
                     onClick={() => handleApproval({ facultyId: user.id, approval: "approve" })}
-                    className='flex_center gap-1 p-2 min-w-[90px] w-full h-fit text-[0.8em] bg-green-600 hover:bg-green-700 text-white drop-shadow'>
+                    className='flex items-center gap-1 p-2 min-w-[90px] w-1/2 h-fit text-[0.8em] bg-green-600 hover:bg-green-700 text-white drop-shadow cursor-pointer'>
                     {isLoading ?
                         <Loader size={20} className='animate-spin' />
                         :
@@ -61,7 +60,7 @@ const UserCard = ({ user }: Props) => {
                 <Button
                     variant="destructive"
                     onClick={() => handleApproval({ facultyId: user.id, approval: "reject" })}
-                    className='flex_center deleteBtnBg gap-1 p-2 min-w-[90px] w-full h-fit text-[0.8em] text-white drop-shadow'>
+                    className='flex_center deleteBtnBg gap-1 p-2 min-w-[90px] w-1/2 h-fit text-[0.8em] text-white drop-shadow cursor-pointer'>
                     {isLoading ?
                         <Loader size={20} className='animate-spin' />
                         :
