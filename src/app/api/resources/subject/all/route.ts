@@ -10,7 +10,20 @@ export async function GET() {
                 subjectName: true,
                 subjectDesc: true,
                 createdAt: true,
-                units: true,
+                units: {
+                    include: {
+                        documents: true,
+                        creator: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                image: true,
+                                isApproved: true,
+                            }
+                        }
+                    }
+                },
                 creator: {
                     select: {
                         id: true,

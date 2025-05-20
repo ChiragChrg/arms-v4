@@ -23,6 +23,7 @@ export async function GET(
                 createdAt: true,
                 units: {
                     include: {
+                        documents: true,
                         creator: {
                             select: {
                                 id: true,
