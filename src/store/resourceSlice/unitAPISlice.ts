@@ -24,11 +24,20 @@ export const unitAPISlice = createApi({
     endpoints: (builder) => ({
         getAllUnits: builder.query<UnitTypes[], unknown>({
             query: () => "/all",
-            providesTags: [API_TAGS.UNITS],
+            providesTags: (result) =>
+                result
+                    ? [
+                        { type: API_TAGS.UNITS as typeof API_TAGS.UNITS, id: "Unit_List" },
+                        ...result.map((unit) => ({ type: API_TAGS.UNIT as typeof API_TAGS.UNIT, id: unit.id })),
+                    ]
+                    : [{ type: API_TAGS.UNITS as typeof API_TAGS.UNITS, id: "Unit_List" }],
         }),
         getUnitBySlug: builder.query<UnitTypes, unknown>({
             query: (slug: string) => `/${slug}`,
-            providesTags: (result) => [{ type: API_TAGS.UNIT, id: result?.id }],
+            providesTags: (result) => [
+                { type: API_TAGS.UNITS as typeof API_TAGS.UNITS, id: "Unit_List" },
+                { type: API_TAGS.UNIT as typeof API_TAGS.UNIT, id: result?.id }
+            ]
         }),
         createUnit: builder.mutation({
             query: (formData: CreateUnitType) => ({

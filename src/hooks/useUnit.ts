@@ -14,7 +14,12 @@ type Params = {
  */
 export const useUnit = (slug: string, params: Params = {}) => {
     const { preferCache = false } = params;
-    const { data: unitList, isLoading: isListLoading } = useGetAllUnitsQuery(undefined, { skip: !preferCache });
+    const { data: unitList, isLoading: isListLoading } = useGetAllUnitsQuery(undefined, {
+        skip: !preferCache,
+        refetchOnMountOrArgChange: true,
+        refetchOnReconnect: true,
+        refetchOnFocus: true,
+    });
 
     // Check if the unit is already in the cache
     const cachedUnit = useMemo(() => {
@@ -30,7 +35,8 @@ export const useUnit = (slug: string, params: Params = {}) => {
 
     // If the unit is not in the cache, fetch it by slug
     const { data: fetchedUnit, isFetching, isLoading } = useGetUnitBySlugQuery(slug, {
-        skip: shouldSkipSlugQuery
+        skip: shouldSkipSlugQuery,
+        refetchOnMountOrArgChange: true,
     });
 
     const unit = (cachedUnit || fetchedUnit) as UnitTypes;

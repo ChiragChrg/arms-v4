@@ -106,16 +106,14 @@ const UploadDocuments = () => {
 
         // Upload Documents info to Database
         try {
-            const res = await createDocuments({
+            await createDocuments({
                 documentData: uploadMeta,
                 unitId: unit.id,
                 creatorId: user.id
             }).unwrap();
 
-            if (res.status == 201) {
-                setIsUploadComplete(true)
-                toast.success("Files uploaded successfully!")
-            }
+            setIsUploadComplete(true)
+            toast.success("Files uploaded successfully!")
         } catch (error) {
             setIsUploadComplete(true)
             console.error(error)

@@ -119,11 +119,9 @@ const UnitInfo = () => {
             });
 
             // Delete from database
-            const res = await deleteDocument(fileId).unwrap();
+            await deleteDocument(fileId).unwrap();
 
-            if (res.status === 200) {
-                toast.success("Document Deleted 👍🏻", { id: deleteToast })
-            }
+            toast.success("Document Deleted 👍🏻", { id: deleteToast })
         } catch (err) {
             console.log("Error while Deleting file: ", err)
             toast.error("Error while Deleting Document", { id: deleteToast })
