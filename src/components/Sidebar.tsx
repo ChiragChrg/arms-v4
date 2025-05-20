@@ -59,7 +59,7 @@ const Sidebar = () => {
                 transform: isMobile ? `translateX(${showSidebar ? "0" : "-150%"})` : `translateX(0)`,
                 pointerEvents: showSidebar ? "auto" : "none",
                 userSelect: showSidebar ? "auto" : "none",
-                width: isTablet ? "50%" : "auto"
+                width: showSidebar ? isTablet ? "50%" : "auto" : "0",
             }}
             className='lg:min-w-[18em] fixed inset-2 lg:inset-auto lg:relative lg:h-full p-3 rounded-2xl lg:rounded-md flex flex-col gap-4 bg-background/10 backdrop-blur-xl z-10 transition-transform duration-500 ease-in-out overflow-hidden'>
             <div
