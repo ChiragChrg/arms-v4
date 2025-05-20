@@ -18,7 +18,7 @@ type FormType = {
     confirmPassword: string
 }
 
-const SignupForm = () => {
+const RegisterForm = () => {
     const [formData, setFormData] = useState<FormType>({
         name: "",
         email: "",
@@ -50,19 +50,18 @@ const SignupForm = () => {
         setIsLoading(true)
 
         try {
-            const res = await register({
+            await register({
                 name,
                 email,
                 password
-            }).unwrap();
+            })
 
-            if (res?.status === 201) {
-                toast.success(res?.message, {
-                    id: SignupToastID
-                })
 
-                router.push("./login")
-            }
+            toast.success("Faculty Registered Successfully!", {
+                id: SignupToastID
+            })
+
+            router.push("./login")
         } catch (err) {
             toast.error("Something went wrong!", {
                 id: SignupToastID
@@ -199,4 +198,4 @@ const SignupForm = () => {
     )
 }
 
-export default SignupForm
+export default RegisterForm
