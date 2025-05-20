@@ -111,7 +111,7 @@ const LoginForm = () => {
 
             <div className="flex_center gap-2 text-[0.9em] sm:text-[0.8em] 2xl:text-[1em]">
                 Don&apos;t have an account yet?
-                <Link href="/signup" className='text-primary'>Signup</Link>
+                <Link href="/register" className='text-primary'>Register</Link>
             </div>
 
             <div className="w-full sm:px-2 flex_center gap-2 font-medium">

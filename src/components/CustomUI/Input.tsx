@@ -10,11 +10,21 @@ interface InputProps {
     placeholder?: string,
     className?: string,
     required?: boolean,
+    autoComplete?: "off" | "on",
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
 }
 
 
-const Input = ({ label, type = "text", name = "", placeholder, className = "", required = false, onChange }: InputProps) => {
+const Input = ({
+    label,
+    type = "text",
+    name = "",
+    placeholder,
+    className = "",
+    required = false,
+    autoComplete = "off",
+    onChange
+}: InputProps) => {
     const [showPassword, setShowPassword] = useState<boolean>(false)
     const TogglePassword = () => {
         setShowPassword(prev => !prev)
@@ -33,6 +43,8 @@ const Input = ({ label, type = "text", name = "", placeholder, className = "", r
                     placeholder={placeholder}
                     required={required}
                     onChange={onChange}
+                    name={name}
+                    autoComplete={autoComplete}
                     className='text-[1em] w-full bg-background/0 px-2 py-1 border-none outline-none placeholder:text-secondary-foreground/70' />
 
                 {type === "password" ?

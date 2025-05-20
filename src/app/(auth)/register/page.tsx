@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import SignupForm from '@/components/Forms/SignupForm'
+import RegisterForm from '@/components/Forms/RegisterForm'
 import Header from '@/components/Header'
 import Trails from '@/components/Trails'
 import { SignupVector } from '@/assets/SVGs'
@@ -12,7 +12,7 @@ const Register = () => {
             <Header className='lg:hidden' />
 
             <section className='h-full flex justify-between items-center flex-col-reverse lg:flex-row px-8 2xl:px-8'>
-                <SignupForm />
+                <RegisterForm />
 
                 <div className=" flex_center flex-col gap-8 mb-6 sm:mb-12 mt-4 sm:mt-0">
                     <p className="text-[2em] whitespace-nowrap sm:text-[2.5em] 2xl:text-[3em] font-medium">
