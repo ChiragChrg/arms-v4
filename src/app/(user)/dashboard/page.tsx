@@ -33,7 +33,7 @@ const Dashboard = () => {
 
             <h1 className='text-[1.6em] text-center sm:text-[2em] font-medium'>
                 Welcome,
-                <span className="text-primary"> {session?.user.name?.split(" ")[0]}!</span>
+                <span className="text-primary"> {session?.user.name?.split(" ")[0] ?? "Student"}</span> !
             </h1>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-8 sm:mx-8 2xl:mx-[10em] mt-4 2xl:mt-8">
