@@ -162,12 +162,13 @@ const UnitInfo = () => {
                     <BookOpenTextIcon size='80' />
                 </div>
 
-                <DropdownSettings
-                    title='Unit'
-                    deleteName={unit?.unitName}
-                    userId={user.id}
-                    isAuthorized={isAuthorized}
-                    documentData={unit} />
+                {user.id !== "anonymous" &&
+                    <DropdownSettings
+                        title='Unit'
+                        deleteName={unit?.unitName}
+                        userId={user.id}
+                        isAuthorized={isAuthorized}
+                        documentData={unit} />}
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">

@@ -61,12 +61,13 @@ const CourseInfo = () => {
                     <BookStackSVG size='80' />
                 </div>
 
-                <DropdownSettings
-                    title='Course'
-                    deleteName={course?.courseName}
-                    isAuthorized={isAuthorized}
-                    userId={user.id}
-                    documentData={course} />
+                {user.id !== "anonymous" &&
+                    <DropdownSettings
+                        title='Course'
+                        deleteName={course?.courseName}
+                        isAuthorized={isAuthorized}
+                        userId={user.id}
+                        documentData={course} />}
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">

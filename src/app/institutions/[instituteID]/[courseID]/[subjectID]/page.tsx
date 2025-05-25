@@ -67,12 +67,13 @@ const SubjectInfo = () => {
                     <OpenBookSVG size='80' />
                 </div>
 
-                <DropdownSettings
-                    title='Subject'
-                    deleteName={subject?.subjectName}
-                    isAuthorized={isAuthorized}
-                    userId={user.id}
-                    documentData={subject} />
+                {user.id !== "anonymous" &&
+                    <DropdownSettings
+                        title='Subject'
+                        deleteName={subject?.subjectName}
+                        isAuthorized={isAuthorized}
+                        userId={user.id}
+                        documentData={subject} />}
 
                 <div className="w-full flex_center flex-col gap-2 px-4 mt-8 sm:mt-0">
                     <div className="flex_center flex-col gap-2 w-full">
