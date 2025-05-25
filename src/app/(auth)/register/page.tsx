@@ -22,7 +22,7 @@ const Register = () => {
                 </div>
             </section>
 
-            <p className='flex_center sm:text-[1.2em] drop-shadow-md sm:text-white'>© Copyright 2023 ChiragChrg</p>
+            <p className='flex_center sm:text-[1.2em] drop-shadow-md sm:text-white'>© Copyright {new Date().getFullYear()} ChiragChrg</p>
 
             <Trails className='hidden lg:inline-flex lg:h-[55%] 2xl:h-[80%]' offsetDirection='right' buttonClass='hidden lg:inline-flex' rotate='45deg' leftBtn />
         </main>

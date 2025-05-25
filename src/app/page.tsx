@@ -53,7 +53,7 @@ export default function Home() {
             </div>
           </div>
 
-          <p className='flex_center sm:text-[1.2em] drop-shadow-md text-white'>© Copyright 2023 ChiragChrg</p>
+          <p className='flex_center sm:text-[1.2em] drop-shadow-md text-white'>© Copyright {new Date().getFullYear()} ChiragChrg</p>
         </div>
       </section>
 

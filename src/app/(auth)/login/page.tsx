@@ -27,7 +27,7 @@ const Login = () => {
                 </div>
             </section>
 
-            <p className='flex_center sm:text-[1.2em] drop-shadow-md sm:text-white'>© Copyright 2023 ChiragChrg</p>
+            <p className='flex_center sm:text-[1.2em] drop-shadow-md sm:text-white'>© Copyright {new Date().getFullYear()} ChiragChrg</p>
 
             <Trails rotate='90deg' yOffset='0%' leftBtn buttonClass='hidden lg:inline-flex' offsetDirection="center" className='hidden lg:block lg:h-[40%] 2xl:h-[80%]' />
         </main>

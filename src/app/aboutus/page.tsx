@@ -5,8 +5,6 @@ import Logo from '@/assets/Icons/Logo'
 import { CLogo, DiscordIcon, FacebookIcon, GithubIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from '@/assets/SVGs';
 
 const About = () => {
-    const currentYear = new Date().getFullYear();
-
     return (
         <main className='relative flex flex-col justify-between px-4 py-3 w-full h-full min-h-screen overflow-scroll'>
             <Header disableAuthRedirect={true} />
@@ -82,7 +80,7 @@ const About = () => {
                         </a>
                     </div>
 
-                    <span className='text-[0.9em]'>© Copyright 2023-{currentYear} ChiragChrg</span>
+                    <span className='text-[0.9em]'>© Copyright {new Date().getFullYear()} ChiragChrg</span>
                 </footer>
             </section>
         </main>

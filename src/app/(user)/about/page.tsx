@@ -5,8 +5,6 @@ import Image from 'next/image';
 import MobileHeader from '@/components/MobileHeader';
 
 const About = () => {
-    const currentYear = new Date().getFullYear();
-
     return (
         <section className='flex flex-col justify-between gap-4 px-4 py-3 w-full h-full min-h-screen'>
             <MobileHeader />
@@ -67,7 +65,7 @@ const About = () => {
                     </a>
                 </div>
 
-                <span className='text-[0.9em]'>© Copyright 2023-{currentYear} ChiragChrg</span>
+                <span className='text-[0.9em]'>© Copyright {new Date().getFullYear()} ChiragChrg</span>
             </footer>
         </section>
     )
