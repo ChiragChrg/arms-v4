@@ -36,7 +36,7 @@ const ForgotPassword = () => {
                 //Sending Mail to User
                 const mailRes = await send(
                     process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID as string,
-                    process.env.NEXT_PUBLIC_EMAILJS_PASSWPRD_RESET_TEMPLATE as string,
+                    process.env.NEXT_PUBLIC_EMAILJS_PASSWORD_RESET_TEMPLATE as string,
                     templateParams,
                     process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY as string
                 );
