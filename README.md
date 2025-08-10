@@ -12,6 +12,35 @@
 
 ARMS is designed to empower students with effortless, anonymous access to subject-wise study materials. Students can conveniently browse and download PDF resources uploaded by authorized faculty, benefiting from a centralized, user-friendly platform that streamlines academic resource management. The intuitive interface ensures a seamless experience for both students and faculty—enabling quick resource discovery, easy uploads, and organized content across institutions, courses, and subjects.
 
+## 🧑‍💻 Tech Stack
+
+<div align="center">
+  <a href="https://nextjs.org/docs/getting-started" title="NextJS">
+    <img src="https://skillicons.dev/icons?i=nextjs" alt="NextJS" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://react.dev/learn" title="ReactJS">
+    <img src="https://skillicons.dev/icons?i=react" alt="ReactJS" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://tailwindcss.com/docs/installation" title="TailwindCSS">
+    <img src="https://skillicons.dev/icons?i=tailwind" alt="TailwindCSS" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://www.typescriptlang.org/docs/" title="TypeScript">
+    <img src="https://skillicons.dev/icons?i=typescript" alt="TypeScript" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://redux-toolkit.js.org/" title="Redux Toolkit">
+    <img src="https://skillicons.dev/icons?i=redux" alt="Redux Toolkit" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://www.mongodb.com/docs/" title="MongoDB">
+    <img src="https://skillicons.dev/icons?i=mongodb" alt="MongoDB" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://www.prisma.io/docs/" title="Prisma ORM">
+    <img src="https://skillicons.dev/icons?i=prisma" alt="Prisma ORM" width="40" height="40"/>
+  </a>&nbsp;
+  <a href="https://authjs.dev/" title="Auth.js"><img src="https://raw.githubusercontent.com/ChiragChrg/ChiragChrg.github.io/main/icons/nextauth.svg" alt="Auth.js" width="40" height="40"/></a>&nbsp;
+  <a href="https://edgestore.dev/docs" title="EdgeStore">
+    <img alt="EdgeStore" title="EdgeStore" width="40px" height="40px" src="https://raw.githubusercontent.com/ChiragChrg/ChiragChrg.github.io/main/icons/edgestore.webp" />
+  </a>
+</div>
 
 ## ✨ Key Features
 
@@ -43,36 +72,6 @@ ARMS is designed to empower students with effortless, anonymous access to subjec
 - **Offline Capability**: Downloaded resources available without internet
 - **Scalable Architecture**: Supports thousands of concurrent users
 - **Type-Safe Operations**: Eliminates runtime errors through comprehensive TypeScript integration
-
-## 🧑‍💻 Tech Stack
-
-<div align="center">
-  <a href="https://nextjs.org/docs/getting-started" title="NextJS">
-    <img src="https://skillicons.dev/icons?i=nextjs" alt="NextJS" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://react.dev/learn" title="ReactJS">
-    <img src="https://skillicons.dev/icons?i=react" alt="ReactJS" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://tailwindcss.com/docs/installation" title="TailwindCSS">
-    <img src="https://skillicons.dev/icons?i=tailwind" alt="TailwindCSS" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://www.typescriptlang.org/docs/" title="TypeScript">
-    <img src="https://skillicons.dev/icons?i=typescript" alt="TypeScript" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://redux-toolkit.js.org/" title="Redux Toolkit">
-    <img src="https://skillicons.dev/icons?i=redux" alt="Redux Toolkit" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://www.mongodb.com/docs/" title="MongoDB">
-    <img src="https://skillicons.dev/icons?i=mongodb" alt="MongoDB" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://www.prisma.io/docs/" title="Prisma ORM">
-    <img src="https://skillicons.dev/icons?i=prisma" alt="Prisma ORM" width="40" height="40"/>
-  </a>&emsp;
-  <a href="https://authjs.dev/" title="Auth.js"><img src="https://raw.githubusercontent.com/ChiragChrg/ChiragChrg.github.io/main/icons/nextauth.svg" alt="Auth.js" width="40" height="40"/></a>&emsp;
-  <a href="https://edgestore.dev/docs" title="EdgeStore">
-    <img alt="EdgeStore" title="EdgeStore" width="40px" height="40px" src="https://raw.githubusercontent.com/ChiragChrg/ChiragChrg.github.io/main/icons/edgestore.webp" />
-  </a>
-</div>
 
 ## 🚀 What's New in v4
 
