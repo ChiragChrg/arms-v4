@@ -154,6 +154,10 @@
     @apply bg-background text-foreground relative min-h-screen;
   }
 
+  button {
+    @apply cursor-pointer;
+  }
+
   .flex_center {
     @apply flex justify-center items-center
   }
