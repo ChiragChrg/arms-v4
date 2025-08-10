@@ -1,0 +1,63 @@
+model Institute {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    instituteName String   @unique()
+    description   String
+    createdAt     DateTime @default(now()) @db.Date
+
+    courses   Course[]
+    creator   User     @relation("InstituteCreator", fields: [creatorId], references: [id])
+    creatorId String   @db.ObjectId
+}
+
+model Course {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    courseName String
+    courseDesc String
+    createdAt  DateTime @default(now()) @db.Date
+
+    subjects    Subject[]
+    creator     User      @relation("CourseCreator", fields: [creatorId], references: [id])
+    creatorId   String    @db.ObjectId
+    institute   Institute @relation(fields: [instituteId], references: [id])
+    instituteId String    @db.ObjectId
+}
+
+model Subject {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    subjectName String
+    subjectDesc String
+    createdAt   DateTime @default(now()) @db.Date
+
+    units     Unit[]
+    creator   User   @relation("SubjectCreator", fields: [creatorId], references: [id])
+    creatorId String @db.ObjectId
+    course    Course @relation(fields: [courseId], references: [id])
+    courseId  String @db.ObjectId
+}
+
+model Unit {
+    id        String     @id @default(auto()) @map("_id") @db.ObjectId
+    unitName  String
+    unitDesc  String
+    createdAt DateTime   @default(now()) @db.Date
+    documents Document[]
+    creator   User       @relation("UnitCreator", fields: [creatorId], references: [id])
+    creatorId String     @db.ObjectId
+    subject   Subject    @relation(fields: [subjectId], references: [id])
+    subjectId String     @db.ObjectId
+}
+
+model Document {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    documentName String
+    documentDesc String
+    type         String
+    size         String
+    link         String
+    createdAt    DateTime @default(now()) @db.Date
+
+    creator   User   @relation("DocumentCreator", fields: [creatorId], references: [id])
+    creatorId String @db.ObjectId
+    unit      Unit   @relation(fields: [unitId], references: [id])
+    unitId    String @db.ObjectId
+}
