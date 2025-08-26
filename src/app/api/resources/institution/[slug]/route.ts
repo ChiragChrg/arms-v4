@@ -111,14 +111,14 @@ export async function GET(
 // Delete an institution
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
         // Check if the institution exists
         const existingInstitution = await prisma.institute.findUnique({
-            where: { id },
+            where: { id: slug },
         });
 
         if (!existingInstitution) {
@@ -127,7 +127,7 @@ export async function DELETE(
 
         // Delete the institution
         await prisma.institute.delete({
-            where: { id },
+            where: { id: slug },
         });
 
         return NextResponse.json({ message: "Institution deleted successfully" }, { status: 200 });

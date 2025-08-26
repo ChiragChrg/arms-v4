@@ -94,17 +94,17 @@ export async function GET(
 // Delete Course
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
-        if (!id) {
+        if (!slug) {
             return NextResponse.json({ error: 'Missing course ID' }, { status: 400 });
         }
 
         const deletedCourse = await prisma.course.delete({
-            where: { id },
+            where: { id: slug },
         });
 
         return NextResponse.json(deletedCourse, { status: 200 });

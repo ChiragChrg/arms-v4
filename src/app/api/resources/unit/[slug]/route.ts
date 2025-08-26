@@ -56,13 +56,13 @@ export async function GET(
 // Delete Unit
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
         const deletedUnit = await prisma.unit.delete({
-            where: { id }
+            where: { id: slug }
         });
 
         return NextResponse.json(deletedUnit, { status: 200 });
