@@ -75,17 +75,17 @@ export async function GET(
 // Delete Subject
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
-    const { id } = await params;
+    const { slug } = await params;
 
     try {
-        if (!id) {
+        if (!slug) {
             return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
         }
 
         const deletedSubject = await prisma.subject.delete({
-            where: { id },
+            where: { id: slug },
         });
 
         return NextResponse.json(deletedSubject, { status: 200 });
