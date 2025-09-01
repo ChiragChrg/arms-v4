@@ -4,7 +4,7 @@
 
 ![ARMS v4 Preview](public/screenshots/ARMSv4Mockup.png)
 
-### Live Demo: [https://arms-v4.vercel.app](https://arms-v4.vercel.app)
+- ### Live Demo: [https://arms-v4.vercel.app](https://arms-v4.vercel.app)
 
 ## 🎓 Introduction
 
@@ -12,6 +12,12 @@
 
 ARMS is designed to empower students with effortless, anonymous access to subject-wise study materials. Students can conveniently browse and download PDF resources uploaded by authorized faculty, benefiting from a centralized, user-friendly platform that streamlines academic resource management. The intuitive interface ensures a seamless experience for both students and faculty—enabling quick resource discovery, easy uploads, and organized content across institutions, courses, and subjects.
 
+### Versions:
+- [ARMS v1 (PHP)](https://github.com/ChiragChrg/arms-php)
+- [ARMS v2](https://github.com/ChiragChrg/arms-v2)
+- [ARMS v3](https://github.com/ChiragChrg/arms-v3)
+- ARMS v4
+  
 ## 🧑‍💻 Tech Stack
 
 <div align="center">
