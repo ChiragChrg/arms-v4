@@ -63,15 +63,15 @@ const ForgotPassword = () => {
                     <Image src={ForgotPasswordVector} alt='ForgotPasswordVector' className='w-[280px] sm:w-[320px] 2xl:w-[400px]' priority={true} />
                 </div>
 
-                <form onSubmit={HandleSubmit} className='flex flex-col sm:flex-row items-end gap-4'>
+                <form onSubmit={HandleSubmit} className='flex flex-col items-end gap-4'>
                     <Input
                         type='email'
                         label='Email'
                         placeholder='example@gmail.com'
-                        className='block w-full 2xl:w-[600px]'
+                        className='block w-full 2xl:w-[400px]'
                         onChange={(e) => setEmail(e.target.value)} />
 
-                    <Button type='submit' className='w-full sm:max-w-[300px] flex_center gap-4 text-white' disabled={isLoading}>
+                    <Button type='submit' className='w-full flex_center gap-4 text-white' disabled={isLoading}>
                         {isLoading ?
                             <Loader2Icon className='animate-spin' />
                             : <KeyRoundIcon />
